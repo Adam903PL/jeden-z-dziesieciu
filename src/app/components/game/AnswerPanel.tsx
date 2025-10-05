@@ -8,6 +8,7 @@ interface AnswerPanelProps {
   activeTeam: Team;
   teams: Team[];
   questionId?: number;
+  totalPointsThisTurn: number;
   onCorrectAnswer: (targetTeamId: number, multiplier: number) => void;
   onWrongAnswer: (pointsLost: number) => void;
   onCancel: () => void;
@@ -18,6 +19,7 @@ const AnswerPanel: React.FC<AnswerPanelProps> = ({
   activeTeam, 
   teams, 
   questionId,
+  totalPointsThisTurn,
   onCorrectAnswer, 
   onWrongAnswer,
   onCancel,
@@ -27,12 +29,14 @@ const AnswerPanel: React.FC<AnswerPanelProps> = ({
   const [targetType, setTargetType] = useState<'self' | 'other' | null>(null);
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
   const [multiplier, setMultiplier] = useState(1);
+  const [selfAnswerCount, setSelfAnswerCount] = useState(0); // Track "on myself" answers in current turn
 
   const resetPanel = useCallback(() => {
     setAnswerStatus('pending');
     setTargetType(null);
     setSelectedTeamId(null);
     setMultiplier(1);
+    setSelfAnswerCount(0);
   }, []);
 
   useEffect(() => {
@@ -45,6 +49,7 @@ const AnswerPanel: React.FC<AnswerPanelProps> = ({
       setTargetType(null);
       setSelectedTeamId(null);
       setMultiplier(1);
+      setSelfAnswerCount(0); // Reset self answer count on wrong answer
     }
   };
 
@@ -52,10 +57,17 @@ const AnswerPanel: React.FC<AnswerPanelProps> = ({
     setTargetType(type);
     if (type === 'self') {
       setSelectedTeamId(activeTeam.id);
-      setMultiplier(2);
+      // Calculate multiplier based on consecutive "on myself" answers
+      // Multiplier: 2^count (1 -> 2, 2 -> 4, 3 -> 8, itd.)
+      const newCount = selfAnswerCount + 1;
+      setSelfAnswerCount(newCount);
+      const calculatedMultiplier = Math.pow(2, newCount);
+      setMultiplier(calculatedMultiplier);
     } else {
       setSelectedTeamId(null);
       setMultiplier(1);
+      // Reset "on myself" count when choosing another team
+      setSelfAnswerCount(0);
     }
   };
 
@@ -64,11 +76,16 @@ const AnswerPanel: React.FC<AnswerPanelProps> = ({
       const targetTeamId = targetType === 'self' ? activeTeam.id : selectedTeamId;
       if (targetTeamId) {
         onCorrectAnswer(targetTeamId, multiplier);
+        // Only reset self answer count if we're not choosing "on myself" again
+        if (targetType !== 'self') {
+          setSelfAnswerCount(0);
+        }
         resetPanel();
       }
     } else if (answerStatus === 'wrong') {
-      // Traci punkty zdobyte w tej turze - na razie ustawiamy na 0, można dostosować
-      onWrongAnswer(0);
+      // Traci wszystkie punkty zdobyte w tej turze
+      // Only pass points to subtract if there are actually accumulated points
+      onWrongAnswer(totalPointsThisTurn > 0 ? totalPointsThisTurn : 0);
       resetPanel();
     }
   };
@@ -170,30 +187,11 @@ const AnswerPanel: React.FC<AnswerPanelProps> = ({
           {targetType && (
             <div className="mb-4">
               <h5 className="text-lg font-bold text-white mb-3 text-center">Mnożnik punktów: x{multiplier}</h5>
-              <div className="flex justify-center gap-4">
-                <button
-                  onClick={() => setMultiplier(1)}
-                  className={`px-4 py-2 rounded-lg font-bold ${
-                    multiplier === 1
-                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
-                      : 'bg-gray-700 text-white hover:bg-gray-600'
-                  }`}
-                >
-                  x1
-                </button>
-                {targetType === 'self' && (
-                  <button
-                    onClick={() => setMultiplier(2)}
-                    className={`px-4 py-2 rounded-lg font-bold ${
-                      multiplier === 2
-                        ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-black'
-                        : 'bg-gray-700 text-white hover:bg-gray-600'
-                    }`}
-                  >
-                    x2
-                  </button>
-                )}
-              </div>
+              {targetType === 'self' && (
+                <div className="text-center text-gray-300 text-sm">
+                  Odpowiedzi "na siebie" w tej turze: {selfAnswerCount}
+                </div>
+              )}
             </div>
           )}
         </div>

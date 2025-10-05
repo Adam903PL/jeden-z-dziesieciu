@@ -1,8 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Team } from '../../lib/types';
-import { RotateCcw, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
+
+interface Team {
+  id: number;
+  name: string;
+  eliminated?: boolean;
+}
 
 interface FortuneWheelProps {
   teams: Team[];
@@ -23,31 +28,41 @@ const FortuneWheel: React.FC<FortuneWheelProps> = ({ teams, onTeamSelected, onFi
     setSpinning(true);
     setSelectedTeamId(null);
     
-    // Losowy obrót koła (minimum 3 pełne obroty + losowy kąt)
-    const spins = 3 + Math.random() * 2;
-    const randomRotation = 360 * spins + Math.random() * 360;
-    const newRotation = rotation + randomRotation;
+    // Losowy indeks drużyny
+    const randomIndex = Math.floor(Math.random() * activeTeams.length);
     
-    setRotation(newRotation);
+    // Obliczamy kąt dla wybranej drużyny
+    const segmentAngle = 360 / activeTeams.length;
+    const targetAngle = randomIndex * segmentAngle + segmentAngle / 2;
     
-    // Po zakończeniu animacji wybieramy drużynę
+    // Dodajemy 5-7 pełnych obrotów + docelowy kąt
+    const fullSpins = 5 + Math.floor(Math.random() * 3);
+    const finalRotation = fullSpins * 360 + targetAngle;
+    
+    setRotation(finalRotation);
+    
+    // Po zakończeniu animacji
     setTimeout(() => {
-      // Obliczamy indeks wybranej drużyny na podstawie końcowego obrotu
-      const normalizedRotation = newRotation % 360;
-      const segmentAngle = 360 / activeTeams.length;
-      // Odwracamy kąt, ponieważ koło obraca się przeciwnie do ruchu wskazówek zegara
-      const selectedIndex = Math.floor((360 - normalizedRotation) / segmentAngle) % activeTeams.length;
-      
-      const selectedTeam = activeTeams[selectedIndex];
+      const selectedTeam = activeTeams[randomIndex];
       setSelectedTeamId(selectedTeam.id);
       setSpinning(false);
       
-      // Automatycznie przekazujemy wybraną drużynę po krótkim opóźnieniu
       setTimeout(() => {
         onTeamSelected(selectedTeam.id);
       }, 1000);
-    }, 3000);
+    }, 4000);
   };
+
+  const colors = [
+    'bg-red-500',
+    'bg-blue-500',
+    'bg-green-500',
+    'bg-yellow-500',
+    'bg-purple-500',
+    'bg-pink-500',
+    'bg-indigo-500',
+    'bg-orange-500',
+  ];
 
   return (
     <div className="bg-gradient-to-br from-gray-800 to-gray-900 border-4 border-yellow-400 rounded-2xl p-8 shadow-2xl">
@@ -56,88 +71,130 @@ const FortuneWheel: React.FC<FortuneWheelProps> = ({ teams, onTeamSelected, onFi
       </h3>
       
       <div className="flex flex-col items-center">
-        {/* Wizualizacja koła fortuny */}
+        {/* Koło fortuny */}
         <div className="relative mb-8">
-          <div 
-            className={`w-64 h-64 rounded-full border-8 border-yellow-400 relative overflow-hidden transition-transform duration-3000 ease-out ${
-              spinning ? 'animate-pulse' : ''
-            }`}
-            style={{ 
-              transform: `rotate(${rotation}deg)`,
-              transition: spinning ? 'transform 3s cubic-bezier(0.2, 0.8, 0.3, 1)' : 'none'
-            }}
-          >
-            {activeTeams.map((team, index) => {
-              const angle = (360 / activeTeams.length) * index;
-              const isSelected = selectedTeamId === team.id;
+          {/* Wskaźnik na górze */}
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-4 z-20">
+            <div className="w-0 h-0 border-l-[20px] border-r-[20px] border-t-[30px] border-l-transparent border-r-transparent border-t-red-600"></div>
+          </div>
+          
+          {/* Koło */}
+          <div className="relative w-80 h-80">
+            <svg
+              viewBox="0 0 200 200"
+              className="w-full h-full drop-shadow-2xl"
+              style={{
+                transform: `rotate(${rotation}deg)`,
+                transition: spinning ? 'transform 4s cubic-bezier(0.17, 0.67, 0.3, 0.99)' : 'none'
+              }}
+            >
+              {/* Cień koła */}
+              <circle cx="100" cy="100" r="98" fill="#1f2937" opacity="0.5" />
               
-              return (
-                <div
-                  key={team.id}
-                  className={`absolute top-0 left-1/2 w-1/2 h-1/2 origin-bottom-left flex items-center justify-center ${
-                    isSelected ? 'bg-yellow-400/30' : 'bg-gray-700/50'
-                  }`}
-                  style={{
-                    transform: `rotate(${angle}deg) skewY(${90 - (360 / activeTeams.length)}deg)`,
-                    transformOrigin: '0% 100%'
-                  }}
-                >
-                  <span 
-                    className={`text-xs font-bold text-center px-2 transform -rotate-${angle} ${
-                      isSelected ? 'text-yellow-400' : 'text-white'
-                    }`}
-                    style={{ 
-                      transform: `rotate(${-(angle + (360 / activeTeams.length) / 2)}deg)`,
-                      width: '80px'
-                    }}
-                  >
-                    {team.name}
-                  </span>
-                </div>
-              );
-            })}
-            
-            {/* Wskaźnik */}
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-red-500 rounded-full z-10 flex items-center justify-center">
-              <div className="w-0 h-0 border-l-8 border-r-8 border-t-12 border-l-transparent border-r-transparent border-t-red-500 absolute -bottom-3"></div>
-            </div>
+              {/* Segmenty */}
+              {activeTeams.map((team, index) => {
+                const segmentAngle = 360 / activeTeams.length;
+                const startAngle = index * segmentAngle - 90;
+                const endAngle = startAngle + segmentAngle;
+                
+                const startRad = (startAngle * Math.PI) / 180;
+                const endRad = (endAngle * Math.PI) / 180;
+                
+                const x1 = 100 + 95 * Math.cos(startRad);
+                const y1 = 100 + 95 * Math.sin(startRad);
+                const x2 = 100 + 95 * Math.cos(endRad);
+                const y2 = 100 + 95 * Math.sin(endRad);
+                
+                const largeArc = segmentAngle > 180 ? 1 : 0;
+                
+                const path = `M 100 100 L ${x1} ${y1} A 95 95 0 ${largeArc} 1 ${x2} ${y2} Z`;
+                
+                const midAngle = startAngle + segmentAngle / 2;
+                const textX = 100 + 60 * Math.cos((midAngle * Math.PI) / 180);
+                const textY = 100 + 60 * Math.sin((midAngle * Math.PI) / 180);
+                
+                const colorClass = colors[index % colors.length];
+                const colorMap: { [key: string]: string } = {
+                  'bg-red-500': '#ef4444',
+                  'bg-blue-500': '#3b82f6',
+                  'bg-green-500': '#22c55e',
+                  'bg-yellow-500': '#eab308',
+                  'bg-purple-500': '#a855f7',
+                  'bg-pink-500': '#ec4899',
+                  'bg-indigo-500': '#6366f1',
+                  'bg-orange-500': '#f97316',
+                };
+                
+                return (
+                  <g key={team.id}>
+                    <path
+                      d={path}
+                      fill={colorMap[colorClass]}
+                      stroke="#ffffff"
+                      strokeWidth="2"
+                    />
+                    <text
+                      x={textX}
+                      y={textY}
+                      fill="white"
+                      fontSize="10"
+                      fontWeight="bold"
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      transform={`rotate(${midAngle + 90}, ${textX}, ${textY})`}
+                    >
+                      {team.name.length > 12 ? team.name.substring(0, 10) + '...' : team.name}
+                    </text>
+                  </g>
+                );
+              })}
+              
+              {/* Obramowanie koła */}
+              <circle cx="100" cy="100" r="95" fill="none" stroke="#fbbf24" strokeWidth="6" />
+              
+              {/* Środek koła */}
+              <circle cx="100" cy="100" r="15" fill="#fbbf24" />
+              <circle cx="100" cy="100" r="10" fill="#1f2937" />
+            </svg>
           </div>
         </div>
 
-        {/* Przycisk do kręcenia kołem */}
+        {/* Przycisk */}
         <button
           onClick={spinWheel}
           disabled={spinning || activeTeams.length === 0}
-          className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-lg transition-all ${
+          className={`flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-xl transition-all transform ${
             spinning || activeTeams.length === 0
               ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              : 'bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black shadow-lg hover:scale-105'
+              : 'bg-gradient-to-r from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-black shadow-lg hover:scale-110 active:scale-95'
           }`}
         >
-          <Play className="w-5 h-5" />
-          {spinning ? 'Koło się kręci...' : 'Zakręć kołem'}
+          <Play className="w-6 h-6" />
+          {spinning ? 'Koło się kręci...' : 'ZAKRĘĆ KOŁEM!'}
         </button>
 
-        {/* Wyświetlanie wybranej drużyny */}
+        {/* Wybrana drużyna */}
         {selectedTeamId && !spinning && (
-          <div className="mt-6 p-4 bg-gradient-to-r from-green-600 to-green-500 rounded-xl text-white text-center animate-pulse">
-            <p className="text-xl font-bold">
-              Wybrana drużyna: {activeTeams.find(t => t.id === selectedTeamId)?.name}
+          <div className="mt-6 p-6 bg-gradient-to-r from-green-500 to-green-600 rounded-xl text-white text-center shadow-xl animate-pulse">
+            <p className="text-2xl font-bold">
+              🎉 {activeTeams.find(t => t.id === selectedTeamId)?.name} 🎉
             </p>
           </div>
         )}
 
-        {/* Lista aktywnych drużyn */}
-        <div className="mt-6 w-full">
-          <h4 className="text-xl font-bold text-white mb-3 text-center">Aktywne drużyny:</h4>
-          <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto custom-scrollbar">
-            {activeTeams.map(team => (
+        {/* Lista drużyn */}
+        <div className="mt-8 w-full">
+          <h4 className="text-xl font-bold text-yellow-400 mb-4 text-center">
+            Aktywne drużyny ({activeTeams.length})
+          </h4>
+          <div className="grid grid-cols-2 gap-3 max-h-48 overflow-y-auto pr-2">
+            {activeTeams.map((team, index) => (
               <div
                 key={team.id}
-                className={`p-2 rounded-lg text-center ${
+                className={`p-3 rounded-lg text-center font-semibold transition-all ${
                   selectedTeamId === team.id && !spinning
-                    ? 'bg-yellow-400 text-black font-bold'
-                    : 'bg-gray-700 text-white'
+                    ? 'bg-yellow-400 text-black scale-105 shadow-lg'
+                    : `${colors[index % colors.length]} text-white`
                 }`}
               >
                 {team.name}
@@ -146,11 +203,11 @@ const FortuneWheel: React.FC<FortuneWheelProps> = ({ teams, onTeamSelected, onFi
           </div>
         </div>
 
-        {/* Przycisk Zakończ grę */}
+        {/* Zakończ grę */}
         {onFinishGame && (
           <button
             onClick={onFinishGame}
-            className="mt-6 w-full bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 border-4 border-red-600 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-[0_0_30px_rgba(239,68,68,0.4)] text-lg uppercase"
+            className="mt-8 w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 border-2 border-red-500 text-white font-bold py-4 px-6 rounded-xl transition-all shadow-xl text-lg uppercase hover:scale-105 active:scale-95"
           >
             ⏹️ Zakończ Grę
           </button>

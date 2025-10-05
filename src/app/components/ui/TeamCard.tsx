@@ -8,23 +8,25 @@ interface TeamCardProps {
   team: Team;
   isActive?: boolean;
   stage: GameStage;
+  onClick?: () => void; // Nowa prop
 }
 
-const TeamCard: React.FC<TeamCardProps> = ({ team, isActive, stage }) => {
-  const isFinalStage = stage === 'stage3-part1' || stage === 'stage3-part2' || stage === 'finished';
-  const pointsClassName = isFinalStage
-    ? 'bg-gradient-to-r from-white to-gray-200 text-black'
-    : 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-black';
+const TeamCard: React.FC<TeamCardProps> = ({ team, isActive, stage, onClick }) => {
+  const isClickable = onClick && !team.eliminated;
 
   return (
-    <div className={`
-      bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-5 border-3 transition-all transform
-      ${isActive 
-        ? 'border-white shadow-[0_0_40px_rgba(255,255,255,0.6)] scale-105 border-4' 
-        : 'border-gray-700 hover:border-gray-300'
-      }
-      ${team.eliminated ? 'opacity-30 grayscale' : 'hover:scale-102'}
-    `}>
+    <div 
+      onClick={isClickable ? onClick : undefined}
+      className={`
+        bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-5 border-3 transition-all transform
+        ${isActive 
+          ? 'border-yellow-400 shadow-[0_0_40px_rgba(234,179,8,0.6)] scale-105 border-4' 
+          : 'border-gray-700 hover:border-gray-600'
+        }
+        ${team.eliminated ? 'opacity-30 grayscale' : 'hover:scale-102'}
+        ${isClickable ? 'cursor-pointer hover:border-yellow-400/50' : ''}
+      `}
+    >
       <div className="flex justify-between items-start mb-3">
         <div className="flex-1">
           <h3 className="text-2xl font-bold text-white truncate mb-1">{team.name}</h3>
@@ -35,7 +37,7 @@ const TeamCard: React.FC<TeamCardProps> = ({ team, isActive, stage }) => {
             <XCircle className="w-6 h-6 text-white" />
           </div>
         ) : isActive && (
-          <div className="bg-white rounded-full p-2 animate-pulse">
+          <div className="bg-yellow-400 rounded-full p-2 animate-pulse">
             <Zap className="w-6 h-6 text-black" />
           </div>
         )}
@@ -58,9 +60,11 @@ const TeamCard: React.FC<TeamCardProps> = ({ team, isActive, stage }) => {
         <div className="text-gray-300 text-sm font-bold">
           Szanse: <span className="text-white text-lg">{team.chances}</span>
         </div>
-        <div className={`${pointsClassName} font-bold text-xl px-4 py-1 rounded-full shadow-lg`}>
-          {team.points} pkt
-        </div>
+        {(stage === 'stage3-part1' || stage === 'stage3-part2' || stage === 'finished' || stage === 'stage1') && (
+          <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold text-xl px-4 py-1 rounded-full shadow-lg">
+            {team.points} pkt
+          </div>
+        )}
       </div>
     </div>
   );
