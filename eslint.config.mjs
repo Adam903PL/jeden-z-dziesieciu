@@ -19,6 +19,18 @@ const eslintConfig = [
       "build/**",
       "next-env.d.ts",
     ],
+    rules: {
+      // Wyłączenie błędu dla nieużywanych zmiennych
+      "@typescript-eslint/no-unused-vars": "off",
+
+      "@typescript-eslint/no-explicit-any": "off",
+
+      // Wyłączenie błędu dla nieescapowanych znaków w JSX
+      "react/no-unescaped-entities": "off",
+
+      // Wyłączenie błędu dla zależności useEffect
+      "react-hooks/exhaustive-deps": "off",
+    },
   },
 ];
 

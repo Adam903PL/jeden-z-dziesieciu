@@ -1,0 +1,740 @@
+import React, { useState, useEffect } from 'react';
+import { Users, Play, Trophy, AlertCircle, CheckCircle, XCircle, Settings, Image, Music, Video, Zap } from 'lucide-react';
+
+// Types
+interface Team {
+  id: number;
+  name: string;
+  chances: number;
+  points: number;
+  eliminated: boolean;
+  members: number;
+}
+
+type GameStage = 'setup' | 'stage1' | 'stage2' | 'stage3-part1' | 'stage3-part2' | 'finished';
+
+type QuestionType = 'text' | 'image' | 'audio' | 'video';
+
+interface Question {
+  id: number;
+  type: QuestionType;
+  question: string;
+  mediaPath?: string;
+  answer: string;
+  category?: string;
+}
+
+interface QuestionBank {
+  questions: Question[];
+}
+
+// Sample Questions JSON
+const sampleQuestions: QuestionBank = {
+  questions: [
+    {
+      id: 1,
+      type: "text",
+      question: "Jaka jest stolica Polski?",
+      answer: "Warszawa",
+      category: "Geografia"
+    },
+    {
+      id: 2,
+      type: "image",
+      question: "Co przedstawia ten obraz?",
+      mediaPath: "/media/images/question2.jpg",
+      answer: "Wawel",
+      category: "Historia"
+    },
+    {
+      id: 3,
+      type: "audio",
+      question: "Kto jest autorem tego utworu?",
+      mediaPath: "/media/audio/question3.mp3",
+      answer: "Chopin",
+      category: "Muzyka"
+    },
+    {
+      id: 4,
+      type: "video",
+      question: "Jakie miasto jest pokazane w tym filmie?",
+      mediaPath: "/media/video/question4.mp4",
+      answer: "Kraków",
+      category: "Geografia"
+    }
+  ]
+};
+
+// Game Service
+class GameService {
+  static readonly STAGE1_CHANCES = 3;
+  static readonly STAGE2_INITIAL_CHANCES = 3;
+  static readonly STAGE3_INITIAL_CHANCES = 3;
+  static readonly STAGE3_MAX_QUESTIONS = 40;
+  static readonly POINTS_CORRECT = 10;
+  static readonly POINTS_SELF_ANSWER = 20;
+  static readonly POINTS_PER_CHANCE = 10;
+
+  static checkStage1Elimination(wrongAnswers: number): boolean {
+    return wrongAnswers >= 2;
+  }
+
+  static checkGeneralElimination(chances: number): boolean {
+    return chances <= 0;
+  }
+
+  static shouldProgressToStage2(teams: Team[]): boolean {
+    return teams.filter(t => !t.eliminated).length <= 10;
+  }
+
+  static shouldProgressToStage3(teams: Team[]): boolean {
+    return teams.filter(t => !t.eliminated).length <= 3;
+  }
+
+  static calculateFinalScore(team: Team): number {
+    return team.points + (team.chances * this.POINTS_PER_CHANCE);
+  }
+
+  static loadQuestions(): Question[] {
+    return sampleQuestions.questions;
+  }
+
+  static getRandomQuestion(usedIds: number[]): Question | null {
+    const questions = this.loadQuestions();
+    const available = questions.filter(q => !usedIds.includes(q.id));
+    if (available.length === 0) return null;
+    return available[Math.floor(Math.random() * available.length)];
+  }
+}
+
+// Media Display Component
+const MediaDisplay: React.FC<{ question: Question }> = ({ question }) => {
+  if (question.type === 'text') return null;
+
+  const iconMap = {
+    image: <Image className="w-20 h-20 text-yellow-400" />,
+    audio: <Music className="w-20 h-20 text-yellow-400" />,
+    video: <Video className="w-20 h-20 text-yellow-400" />
+  };
+
+  return (
+    <div className="bg-gradient-to-br from-gray-900 to-black border-4 border-yellow-400 rounded-xl p-8 mb-6 shadow-[0_0_30px_rgba(234,179,8,0.3)]">
+      <div className="flex flex-col items-center">
+        <div className="mb-4 animate-pulse">
+          {iconMap[question.type]}
+        </div>
+        <div className="text-yellow-400 text-center bg-black/50 px-6 py-3 rounded-lg border-2 border-yellow-400/50 backdrop-blur">
+          <p className="text-lg font-mono font-bold">{question.mediaPath}</p>
+        </div>
+        <p className="text-gray-400 text-sm mt-3 uppercase tracking-wider">
+          {question.type === 'image' && '📸 Obraz do wyświetlenia'}
+          {question.type === 'audio' && '🎵 Plik audio do odtworzenia'}
+          {question.type === 'video' && '🎬 Film do odtworzenia'}
+        </p>
+      </div>
+    </div>
+  );
+};
+
+// Question Display Component
+const QuestionDisplay: React.FC<{ 
+  question: Question | null;
+  showAnswer: boolean;
+}> = ({ question, showAnswer }) => {
+  if (!question) {
+    return (
+      <div className="bg-gradient-to-br from-gray-900 to-black border-4 border-gray-700 rounded-2xl p-12 mb-6 shadow-2xl text-center">
+        <Zap className="w-24 h-24 text-gray-600 mx-auto mb-4" />
+        <p className="text-gray-500 text-2xl font-bold">Kliknij "LOSUJ PYTANIE"</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black border-4 border-yellow-400 rounded-2xl p-8 mb-6 shadow-[0_0_50px_rgba(234,179,8,0.4)]">
+      <div className="mb-6">
+        <span className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-black px-6 py-2 text-lg font-bold rounded-full shadow-lg inline-block">
+          {question.category || 'PYTANIE'}
+        </span>
+      </div>
+      
+      <MediaDisplay question={question} />
+      
+      <div className="bg-black/40 border-l-4 border-yellow-400 rounded-lg p-6 backdrop-blur">
+        <h3 className="text-4xl font-bold text-white leading-tight">
+          {question.question}
+        </h3>
+      </div>
+      
+      {showAnswer && (
+        <div className="mt-6 bg-gradient-to-r from-green-600 to-green-500 text-white p-6 rounded-xl border-4 border-green-400 shadow-[0_0_30px_rgba(34,197,94,0.4)] animate-pulse">
+          <p className="text-sm font-bold mb-2 uppercase tracking-wider">✅ POPRAWNA ODPOWIEDŹ:</p>
+          <p className="text-3xl font-bold">{question.answer}</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Setup Component
+const GameSetup: React.FC<{
+  onStart: (teams: Team[]) => void;
+}> = ({ onStart }) => {
+  const [teamCount, setTeamCount] = useState(5);
+  const [membersPerTeam, setMembersPerTeam] = useState(2);
+  const [teamNames, setTeamNames] = useState<string[]>([]);
+
+  useEffect(() => {
+    const names = Array(teamCount).fill('').map((_, i) => `Drużyna ${i + 1}`);
+    setTeamNames(names);
+  }, [teamCount]);
+
+  const handleStart = () => {
+    const teams: Team[] = teamNames.map((name, i) => ({
+      id: i + 1,
+      name: name || `Drużyna ${i + 1}`,
+      chances: GameService.STAGE1_CHANCES,
+      points: 0,
+      eliminated: false,
+      members: membersPerTeam
+    }));
+    onStart(teams);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-8">
+      <div className="bg-gradient-to-br from-gray-800 to-black border-4 border-yellow-400 rounded-2xl p-10 max-w-2xl w-full shadow-[0_0_80px_rgba(234,179,8,0.4)]">
+        <div className="flex items-center gap-4 mb-8 pb-6 border-b-4 border-yellow-400">
+          <Settings className="w-10 h-10 text-yellow-400" />
+          <h1 className="text-5xl font-bold text-white">KONFIGURACJA</h1>
+        </div>
+
+        <div className="space-y-6">
+          <div>
+            <label className="block text-yellow-400 text-xl font-bold mb-3 uppercase tracking-wide">
+              Liczba drużyn (2-10):
+            </label>
+            <input
+              type="number"
+              min="2"
+              max="10"
+              value={teamCount}
+              onChange={(e) => setTeamCount(Math.min(10, Math.max(2, parseInt(e.target.value) || 2)))}
+              className="w-full px-6 py-4 bg-black border-4 border-yellow-400 rounded-xl text-white text-2xl font-bold focus:outline-none focus:border-yellow-300 focus:shadow-[0_0_30px_rgba(234,179,8,0.3)] transition-all"
+            />
+          </div>
+
+          <div>
+            <label className="block text-yellow-400 text-xl font-bold mb-3 uppercase tracking-wide">
+              Liczba osób w drużynie:
+            </label>
+            <input
+              type="number"
+              min="1"
+              max="10"
+              value={membersPerTeam}
+              onChange={(e) => setMembersPerTeam(Math.max(1, parseInt(e.target.value) || 1))}
+              className="w-full px-6 py-4 bg-black border-4 border-yellow-400 rounded-xl text-white text-2xl font-bold focus:outline-none focus:border-yellow-300 focus:shadow-[0_0_30px_rgba(234,179,8,0.3)] transition-all"
+            />
+          </div>
+
+          <div>
+            <label className="block text-yellow-400 text-xl font-bold mb-3 uppercase tracking-wide">
+              Nazwy drużyn:
+            </label>
+            <div className="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
+              {teamNames.map((name, i) => (
+                <input
+                  key={i}
+                  type="text"
+                  value={name}
+                  onChange={(e) => {
+                    const newNames = [...teamNames];
+                    newNames[i] = e.target.value;
+                    setTeamNames(newNames);
+                  }}
+                  placeholder={`Drużyna ${i + 1}`}
+                  className="w-full px-6 py-3 bg-black border-3 border-gray-600 hover:border-yellow-400 rounded-xl text-white text-lg font-bold focus:outline-none focus:border-yellow-400 focus:shadow-[0_0_20px_rgba(234,179,8,0.2)] transition-all"
+                />
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={handleStart}
+            className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-bold py-6 px-8 rounded-xl flex items-center justify-center gap-4 transition-all transform hover:scale-105 shadow-[0_0_40px_rgba(234,179,8,0.5)] text-2xl uppercase tracking-wider"
+          >
+            <Play className="w-8 h-8" />
+            Rozpocznij Grę
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Team Card Component
+const TeamCard: React.FC<{
+  team: Team;
+  isActive?: boolean;
+  stage: GameStage;
+}> = ({ team, isActive, stage }) => {
+  return (
+    <div className={`
+      bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-5 border-3 transition-all transform
+      ${isActive 
+        ? 'border-yellow-400 shadow-[0_0_40px_rgba(234,179,8,0.6)] scale-105 border-4' 
+        : 'border-gray-700 hover:border-gray-600'
+      }
+      ${team.eliminated ? 'opacity-30 grayscale' : 'hover:scale-102'}
+    `}>
+      <div className="flex justify-between items-start mb-3">
+        <div className="flex-1">
+          <h3 className="text-2xl font-bold text-white truncate mb-1">{team.name}</h3>
+          <p className="text-sm text-gray-400 font-semibold">#{team.id} • {team.members} osoby</p>
+        </div>
+        {team.eliminated ? (
+          <div className="bg-red-600 rounded-full p-2">
+            <XCircle className="w-6 h-6 text-white" />
+          </div>
+        ) : isActive && (
+          <div className="bg-yellow-400 rounded-full p-2 animate-pulse">
+            <Zap className="w-6 h-6 text-black" />
+          </div>
+        )}
+      </div>
+
+      <div className="flex gap-2 mb-4">
+        {Array(3).fill(0).map((_, i) => (
+          <div
+            key={i}
+            className={`flex-1 h-4 rounded-full border-2 transition-all ${
+              i < team.chances 
+                ? 'bg-gradient-to-r from-green-500 to-green-400 border-green-400 shadow-[0_0_10px_rgba(34,197,94,0.5)]' 
+                : 'bg-gray-700 border-gray-600'
+            }`}
+          />
+        ))}
+      </div>
+
+      <div className="flex justify-between items-center border-t-2 border-gray-700 pt-3">
+        <div className="text-gray-300 text-sm font-bold">
+          Szanse: <span className="text-white text-lg">{team.chances}</span>
+        </div>
+        {(stage === 'stage3-part1' || stage === 'stage3-part2' || stage === 'finished') && (
+          <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold text-xl px-4 py-1 rounded-full shadow-lg">
+            {team.points} pkt
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Stage Header Component
+const StageHeader: React.FC<{
+  stage: GameStage;
+  questionCount?: number;
+}> = ({ stage, questionCount }) => {
+  const stageNames: Record<GameStage, string> = {
+    'setup': 'KONFIGURACJA',
+    'stage1': 'ETAP I - ROZPOCZĘCIE',
+    'stage2': 'ETAP II - WSKAZYWANIE',
+    'stage3-part1': 'FINAŁ - CZĘŚĆ I',
+    'stage3-part2': 'FINAŁ - CZĘŚĆ II',
+    'finished': 'GRA ZAKOŃCZONA'
+  };
+
+  return (
+    <div className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-400 text-black rounded-2xl p-8 mb-8 shadow-[0_0_60px_rgba(234,179,8,0.5)] border-4 border-yellow-300">
+      <h2 className="text-5xl font-bold text-center mb-2 uppercase tracking-wider">
+        {stageNames[stage]}
+      </h2>
+      {questionCount !== undefined && stage.includes('stage3') && (
+        <p className="text-center text-2xl font-bold">
+          Pytanie {questionCount + 1} / {GameService.STAGE3_MAX_QUESTIONS}
+        </p>
+      )}
+    </div>
+  );
+};
+
+// Control Panel Component
+const ControlPanel: React.FC<{
+  teams: Team[];
+  activeTeamId: number | null;
+  stage: GameStage;
+  currentQuestion: Question | null;
+  showAnswer: boolean;
+  onCorrectAnswer: () => void;
+  onWrongAnswer: () => void;
+  onSelectTeam: (teamId: number) => void;
+  onNextStage: () => void;
+  onAddPoints: (teamId: number, points: number) => void;
+  onNewQuestion: () => void;
+  onToggleAnswer: () => void;
+}> = ({ teams, activeTeamId, stage, currentQuestion, showAnswer, onCorrectAnswer, onWrongAnswer, onSelectTeam, onNextStage, onAddPoints, onNewQuestion, onToggleAnswer }) => {
+  const activeTeams = teams.filter(t => !t.eliminated);
+
+  return (
+    <div className="bg-gradient-to-br from-gray-800 to-gray-900 border-4 border-gray-700 rounded-2xl p-6 shadow-2xl">
+      <h3 className="text-3xl font-bold text-yellow-400 mb-6 border-b-4 border-yellow-400 pb-3 uppercase tracking-wider">
+        Panel Sterowania
+      </h3>
+
+      {stage !== 'finished' && (
+        <>
+          <div className="mb-6 space-y-3">
+            <button
+              onClick={onNewQuestion}
+              className="w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 border-4 border-purple-400 text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-105 shadow-[0_0_30px_rgba(168,85,247,0.4)] text-lg uppercase"
+            >
+              🎲 Losuj Nowe Pytanie
+            </button>
+            
+            {currentQuestion && (
+              <button
+                onClick={onToggleAnswer}
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 border-4 border-blue-400 text-white font-bold py-3 px-6 rounded-xl transition-all shadow-[0_0_20px_rgba(59,130,246,0.4)] uppercase"
+              >
+                {showAnswer ? '👁️ Ukryj' : '👁️ Pokaż'} Odpowiedź
+              </button>
+            )}
+          </div>
+
+          <div className="mb-6">
+            <p className="text-yellow-400 font-bold mb-3 text-lg uppercase">Wybierz drużynę:</p>
+            <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto custom-scrollbar">
+              {activeTeams.map(team => (
+                <button
+                  key={team.id}
+                  onClick={() => onSelectTeam(team.id)}
+                  className={`px-5 py-3 rounded-xl border-3 font-bold transition-all text-lg ${
+                    activeTeamId === team.id
+                      ? 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-black border-yellow-300 shadow-[0_0_25px_rgba(234,179,8,0.5)]'
+                      : 'bg-gray-900 text-white border-gray-700 hover:border-yellow-400 hover:shadow-[0_0_15px_rgba(234,179,8,0.3)]'
+                  }`}
+                >
+                  {team.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {activeTeamId && (
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <button
+                onClick={onCorrectAnswer}
+                className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 border-4 border-green-400 text-white font-bold py-5 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-[0_0_30px_rgba(34,197,94,0.4)] text-lg"
+              >
+                <CheckCircle className="w-6 h-6" />
+                POPRAWNA
+              </button>
+              <button
+                onClick={onWrongAnswer}
+                className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 border-4 border-red-400 text-white font-bold py-5 px-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-[0_0_30px_rgba(239,68,68,0.4)] text-lg"
+              >
+                <XCircle className="w-6 h-6" />
+                BŁĘDNA
+              </button>
+            </div>
+          )}
+
+          {(stage === 'stage3-part1' || stage === 'stage3-part2') && activeTeamId && (
+            <div className="mb-6 p-5 bg-black/40 border-2 border-gray-700 rounded-xl backdrop-blur">
+              <p className="text-yellow-400 font-bold mb-3 text-sm uppercase">Dodaj punkty:</p>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => onAddPoints(activeTeamId, 10)}
+                  className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-all border-2 border-blue-400"
+                >
+                  +10 pkt
+                </button>
+                <button
+                  onClick={() => onAddPoints(activeTeamId, 20)}
+                  className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white font-bold py-3 px-4 rounded-lg transition-all border-2 border-purple-400"
+                >
+                  +20 pkt
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {stage === 'stage1' && activeTeams.length <= 10 && (
+        <button
+          onClick={onNextStage}
+          className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 border-4 border-yellow-300 text-black font-bold py-4 px-6 rounded-xl transition-all shadow-[0_0_40px_rgba(234,179,8,0.5)] text-lg uppercase"
+        >
+          ➡️ Przejdź do Etapu II
+        </button>
+      )}
+
+      {stage === 'stage2' && activeTeams.length <= 3 && (
+        <button
+          onClick={onNextStage}
+          className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 border-4 border-yellow-300 text-black font-bold py-4 px-6 rounded-xl transition-all shadow-[0_0_40px_rgba(234,179,8,0.5)] text-lg uppercase"
+        >
+          🏆 Przejdź do Finału
+        </button>
+      )}
+    </div>
+  );
+};
+
+// Winner Display Component
+const WinnerDisplay: React.FC<{ winner: Team; teams: Team[] }> = ({ winner, teams }) => {
+  const sortedTeams = [...teams].sort((a, b) => 
+    GameService.calculateFinalScore(b) - GameService.calculateFinalScore(a)
+  );
+
+  return (
+    <div className="text-center">
+      <div className="mb-10 bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-600 border-8 border-yellow-300 rounded-3xl p-12 shadow-[0_0_100px_rgba(234,179,8,0.8)]">
+        <Trophy className="w-40 h-40 text-black mx-auto mb-6 animate-bounce" />
+        <h2 className="text-6xl font-bold text-black mb-4 uppercase tracking-wider">ZWYCIĘZCA!</h2>
+        <h3 className="text-5xl font-bold text-black mb-6 border-t-4 border-b-4 border-black py-6">{winner.name}</h3>
+        <p className="text-3xl text-black font-bold">
+          🎉 {GameService.calculateFinalScore(winner)} PUNKTÓW 🎉
+        </p>
+      </div>
+
+      <div className="bg-gradient-to-br from-gray-800 to-gray-900 border-4 border-yellow-400 rounded-2xl p-8 max-w-3xl mx-auto shadow-[0_0_60px_rgba(234,179,8,0.4)]">
+        <h4 className="text-4xl font-bold text-yellow-400 mb-6 border-b-4 border-yellow-400 pb-4 uppercase">Ranking Końcowy</h4>
+        <div className="space-y-4">
+          {sortedTeams.map((team, index) => (
+            <div
+              key={team.id}
+              className={`bg-gradient-to-r ${index === 0 ? 'from-yellow-600 to-yellow-500' : 'from-gray-700 to-gray-800'} border-4 ${index === 0 ? 'border-yellow-400' : 'border-gray-600'} rounded-xl p-5 flex justify-between items-center shadow-lg`}
+            >
+              <div className="flex items-center gap-4">
+                <span className={`text-3xl font-bold ${index === 0 ? 'text-black' : 'text-white'} bg-black/20 w-16 h-16 flex items-center justify-center rounded-xl`}>
+                  #{index + 1}
+                </span>
+                <span className={`text-2xl font-bold ${index === 0 ? 'text-black' : 'text-white'}`}>{team.name}</span>
+              </div>
+              <span className={`text-2xl font-bold ${index === 0 ? 'text-black bg-black/20' : 'text-yellow-400 bg-yellow-400/10'} px-6 py-2 rounded-xl border-2 ${index === 0 ? 'border-black' : 'border-yellow-400'}`}>
+                {GameService.calculateFinalScore(team)} pkt
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Main App Component
+const TeleturiejApp: React.FC = () => {
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [stage, setStage] = useState<GameStage>('setup');
+  const [activeTeamId, setActiveTeamId] = useState<number | null>(null);
+  const [questionCount, setQuestionCount] = useState(0);
+  const [stage1WrongAnswers, setStage1WrongAnswers] = useState<Record<number, number>>({});
+  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+  const [usedQuestionIds, setUsedQuestionIds] = useState<number[]>([]);
+  const [showAnswer, setShowAnswer] = useState(false);
+
+  const handleGameStart = (initialTeams: Team[]) => {
+    setTeams(initialTeams);
+    setStage('stage1');
+    const wrongAnswers: Record<number, number> = {};
+    initialTeams.forEach(team => {
+      wrongAnswers[team.id] = 0;
+    });
+    setStage1WrongAnswers(wrongAnswers);
+  };
+
+  const handleNewQuestion = () => {
+    const question = GameService.getRandomQuestion(usedQuestionIds);
+    if (question) {
+      setCurrentQuestion(question);
+      setUsedQuestionIds([...usedQuestionIds, question.id]);
+      setShowAnswer(false);
+    }
+  };
+
+  const handleCorrectAnswer = () => {
+    if (!activeTeamId) return;
+
+    if (stage === 'stage3-part1' || stage === 'stage3-part2') {
+      setTeams(teams.map(t => 
+        t.id === activeTeamId ? { ...t, points: t.points + GameService.POINTS_CORRECT } : t
+      ));
+      setQuestionCount(prev => prev + 1);
+      
+      if (questionCount + 1 >= GameService.STAGE3_MAX_QUESTIONS) {
+        setStage('finished');
+      }
+    }
+    
+    setActiveTeamId(null);
+    setShowAnswer(false);
+  };
+
+  const handleWrongAnswer = () => {
+    if (!activeTeamId) return;
+
+    setTeams(teams.map(t => {
+      if (t.id === activeTeamId) {
+        const newChances = t.chances - 1;
+        const eliminated = stage === 'stage1' 
+          ? (stage1WrongAnswers[t.id] || 0) + 1 >= 2
+          : newChances <= 0;
+        
+        return { ...t, chances: newChances, eliminated };
+      }
+      return t;
+    }));
+
+    if (stage === 'stage1') {
+      setStage1WrongAnswers(prev => ({
+        ...prev,
+        [activeTeamId]: (prev[activeTeamId] || 0) + 1
+      }));
+    }
+
+    if (stage === 'stage3-part1' || stage === 'stage3-part2') {
+      setQuestionCount(prev => prev + 1);
+      
+      const activeTeams = teams.filter(t => !t.eliminated && t.id !== activeTeamId);
+      if (activeTeams.length === 0 || questionCount + 1 >= GameService.STAGE3_MAX_QUESTIONS) {
+        setStage('finished');
+      }
+    }
+
+    setActiveTeamId(null);
+    setShowAnswer(false);
+  };
+
+  const handleNextStage = () => {
+    if (stage === 'stage1') {
+      setTeams(teams.map(t => !t.eliminated ? { ...t, chances: GameService.STAGE2_INITIAL_CHANCES } : t));
+      setStage('stage2');
+    } else if (stage === 'stage2') {
+      setTeams(teams.map(t => !t.eliminated ? { ...t, chances: GameService.STAGE3_INITIAL_CHANCES } : t));
+      setStage('stage3-part1');
+      setQuestionCount(0);
+    } else if (stage === 'stage3-part1') {
+      setStage('stage3-part2');
+    }
+  };
+
+  const handleAddPoints = (teamId: number, points: number) => {
+    setTeams(teams.map(t => 
+      t.id === teamId ? { ...t, points: t.points + points } : t
+    ));
+  };
+
+  const activeTeams = teams.filter(t => !t.eliminated);
+  const winner = stage === 'finished' && activeTeams.length > 0
+    ? activeTeams.reduce((prev, current) => 
+        GameService.calculateFinalScore(current) > GameService.calculateFinalScore(prev) ? current : prev
+      )
+    : null;
+
+  if (stage === 'setup') {
+    return <GameSetup onStart={handleGameStart} />;
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6">
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #1f2937;
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #fbbf24;
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #f59e0b;
+        }
+      `}</style>
+      
+      <div className="max-w-[1920px] mx-auto">
+        <div className="text-center mb-8 bg-gradient-to-r from-gray-900 via-black to-gray-900 border-8 border-yellow-400 rounded-3xl p-10 shadow-[0_0_100px_rgba(234,179,8,0.6)]">
+          <h1 className="text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 mb-3 tracking-wider drop-shadow-[0_0_30px_rgba(234,179,8,0.8)]">
+            JEDEN Z DZIESIĘCIU
+          </h1>
+          <div className="h-2 bg-gradient-to-r from-transparent via-yellow-400 to-transparent rounded-full mb-4"></div>
+          <p className="text-2xl text-yellow-400 font-bold uppercase tracking-widest">Panel Prowadzącego</p>
+        </div>
+
+        <StageHeader stage={stage} questionCount={stage.includes('stage3') ? questionCount : undefined} />
+
+        {stage === 'finished' && winner ? (
+          <WinnerDisplay winner={winner} teams={teams} />
+        ) : (
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div className="xl:col-span-2 space-y-6">
+              <QuestionDisplay question={currentQuestion} showAnswer={showAnswer} />
+              
+              <div className="bg-gradient-to-br from-gray-800 to-gray-900 border-4 border-gray-700 rounded-2xl p-6 shadow-2xl">
+                <div className="flex items-center gap-3 mb-5 pb-4 border-b-2 border-yellow-400">
+                  <Users className="w-8 h-8 text-yellow-400" />
+                  <h3 className="text-3xl font-bold text-yellow-400 uppercase">Drużyny</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {teams.map(team => (
+                    <TeamCard
+                      key={team.id}
+                      team={team}
+                      isActive={team.id === activeTeamId}
+                      stage={stage}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <ControlPanel
+                teams={teams}
+                activeTeamId={activeTeamId}
+                stage={stage}
+                currentQuestion={currentQuestion}
+                showAnswer={showAnswer}
+                onCorrectAnswer={handleCorrectAnswer}
+                onWrongAnswer={handleWrongAnswer}
+                onSelectTeam={setActiveTeamId}
+                onNextStage={handleNextStage}
+                onAddPoints={handleAddPoints}
+                onNewQuestion={handleNewQuestion}
+                onToggleAnswer={() => setShowAnswer(!showAnswer)}
+              />
+
+              <div className="bg-gradient-to-br from-gray-800 to-gray-900 border-4 border-gray-700 rounded-2xl p-6 shadow-2xl">
+                <div className="flex items-center gap-3 mb-4 pb-3 border-b-2 border-yellow-400">
+                  <AlertCircle className="w-6 h-6 text-yellow-400" />
+                  <h4 className="text-yellow-400 font-bold text-xl uppercase">Statystyki</h4>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-gray-700">
+                    <span className="text-gray-300 font-semibold">Aktywne drużyny:</span>
+                    <span className="text-green-400 font-bold text-xl">{activeTeams.length}</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-gray-700">
+                    <span className="text-gray-300 font-semibold">Wyeliminowane:</span>
+                    <span className="text-red-400 font-bold text-xl">{teams.filter(t => t.eliminated).length}</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-gray-700">
+                    <span className="text-gray-300 font-semibold">Użyte pytania:</span>
+                    <span className="text-yellow-400 font-bold text-xl">{usedQuestionIds.length}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default TeleturiejApp;

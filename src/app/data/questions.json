@@ -1,0 +1,378 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "type": "text",
+      "question": "Jaka jest stolica Polski?",
+      "answer": "Warszawa",
+      "category": "Geografia"
+    },
+    {
+      "id": 2,
+      "type": "text",
+      "question": "W którym roku odbyły się pierwsze nowożytne igrzyska olimpijskie?",
+      "answer": "1896",
+      "category": "Sport"
+    },
+    {
+      "id": 3,
+      "type": "image",
+      "question": "Co przedstawia ten obraz?",
+      "mediaPath": "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg",
+      "answer": "Zamek Królewski na Wawelu",
+      "category": "Historia"
+    },
+    {
+      "id": 4,
+      "type": "text",
+      "question": "Kto napisał 'Pan Tadeusz'?",
+      "answer": "Adam Mickiewicz",
+      "category": "Literatura"
+    },
+    {
+      "id": 5,
+      "type": "audio",
+      "question": "Kto jest autorem tego utworu muzycznego?",
+      "mediaPath": "/media/audio/chopin_polonez.mp3",
+      "answer": "Fryderyk Chopin",
+      "category": "Muzyka"
+    },
+    {
+      "id": 6,
+      "type": "text",
+      "question": "Ile planet znajduje się w Układzie Słonecznym?",
+      "answer": "8",
+      "category": "Astronomia"
+    },
+    {
+      "id": 7,
+      "type": "video",
+      "question": "Jakie miasto jest pokazane w tym filmie?",
+      "mediaPath": "/media/video/krakow_rynek.mp4",
+      "answer": "Kraków",
+      "category": "Geografia"
+    },
+    {
+      "id": 8,
+      "type": "text",
+      "question": "W którym roku Polska wstąpiła do Unii Europejskiej?",
+      "answer": "2004",
+      "category": "Historia"
+    },
+    {
+      "id": 9,
+      "type": "image",
+      "question": "Kto to jest? (portret osoby)",
+      "mediaPath": "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg",
+      "answer": "Józef Piłsudski",
+      "category": "Historia"
+    },
+    {
+      "id": 10,
+      "type": "text",
+      "question": "Jaki jest pierwiastek chemiczny o symbolu Au?",
+      "answer": "Złoto",
+      "category": "Chemia"
+    },
+    {
+      "id": 11,
+      "type": "audio",
+      "question": "Z jakiego filmu pochodzi ta muzyka?",
+      "mediaPath": "/media/audio/soundtrack_titanic.mp3",
+      "answer": "Titanic",
+      "category": "Film"
+    },
+    {
+      "id": 12,
+      "type": "text",
+      "question": "Kto namalował 'Damę z gronostajem'?",
+      "answer": "Leonardo da Vinci",
+      "category": "Sztuka"
+    },
+    {
+      "id": 13,
+      "type": "video",
+      "question": "Jaki sport jest pokazany w tym nagraniu?",
+      "mediaPath": "/media/video/skok_narciarski.mp4",
+      "answer": "Skoki narciarskie",
+      "category": "Sport"
+    },
+    {
+      "id": 14,
+      "type": "text",
+      "question": "Która rzeka jest najdłuższa w Polsce?",
+      "answer": "Wisła",
+      "category": "Geografia"
+    },
+    {
+      "id": 15,
+      "type": "image",
+      "question": "Jaki to zabytek?",
+      "mediaPath": "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg",
+      "answer": "Koloseum",
+      "category": "Historia"
+    },
+    {
+      "id": 16,
+      "type": "text",
+      "question": "W którym roku człowiek po raz pierwszy stanął na Księżycu?",
+      "answer": "1969",
+      "category": "Historia"
+    },
+    {
+      "id": 17,
+      "type": "audio",
+      "question": "Jakiego instrumentu słuchasz?",
+      "mediaPath": "/media/audio/skrzypce_solo.mp3",
+      "answer": "Skrzypce",
+      "category": "Muzyka"
+    },
+    {
+      "id": 18,
+      "type": "text",
+      "question": "Ile wynosi pierwiastek kwadratowy ze 144?",
+      "answer": "12",
+      "category": "Matematyka"
+    },
+    {
+      "id": 19,
+      "type": "video",
+      "question": "Z jakiego kraju pochodzi ten taniec?",
+      "mediaPath": "/media/video/flamenco.mp4",
+      "answer": "Hiszpania",
+      "category": "Kultura"
+    },
+    {
+      "id": 20,
+      "type": "text",
+      "question": "Kto był pierwszym prezydentem Polski po 1989 roku?",
+      "answer": "Lech Wałęsa",
+      "category": "Historia"
+    },
+    {
+      "id": 21,
+      "type": "image",
+      "question": "Jaka to flaga państwowa?",
+      "mediaPath": "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg",
+      "answer": "Francja",
+      "category": "Geografia"
+    },
+    {
+      "id": 22,
+      "type": "text",
+      "question": "Ile kontynentów jest na Ziemi?",
+      "answer": "7",
+      "category": "Geografia"
+    },
+    {
+      "id": 23,
+      "type": "audio",
+      "question": "Jaki to hymn państwowy?",
+      "mediaPath": "/media/audio/hymn_usa.mp3",
+      "answer": "Hymn Stanów Zjednoczonych",
+      "category": "Muzyka"
+    },
+    {
+      "id": 24,
+      "type": "text",
+      "question": "Kto wynalazł żarówkę?",
+      "answer": "Thomas Edison",
+      "category": "Nauka"
+    },
+    {
+      "id": 25,
+      "type": "video",
+      "question": "Jakie zwierzę jest pokazane w tym filmie?",
+      "mediaPath": "/media/video/panda.mp4",
+      "answer": "Panda wielka",
+      "category": "Przyroda"
+    },
+    {
+      "id": 26,
+      "type": "text",
+      "question": "W którym mieście znajduje się Statua Wolności?",
+      "answer": "Nowy Jork",
+      "category": "Geografia"
+    },
+    {
+      "id": 27,
+      "type": "image",
+      "question": "Kto to jest? (zdjęcie naukowca)",
+      "mediaPath": "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg",
+      "answer": "Albert Einstein",
+      "category": "Nauka"
+    },
+    {
+      "id": 28,
+      "type": "text",
+      "question": "Ile serc ma ośmiornica?",
+      "answer": "3",
+      "category": "Przyroda"
+    },
+    {
+      "id": 29,
+      "type": "audio",
+      "question": "Z jakiego filmu pochodzi ta czołówka muzyczna?",
+      "mediaPath": "/media/audio/star_wars_theme.mp3",
+      "answer": "Gwiezdne Wojny",
+      "category": "Film"
+    },
+    {
+      "id": 30,
+      "type": "text",
+      "question": "Kto napisał 'Dziady'?",
+      "answer": "Adam Mickiewicz",
+      "category": "Literatura"
+    },
+    {
+      "id": 31,
+      "type": "video",
+      "question": "Jaki to taniec ludowy?",
+      "mediaPath": "/media/video/mazur.mp4",
+      "answer": "Mazur",
+      "category": "Kultura"
+    },
+    {
+      "id": 32,
+      "type": "text",
+      "question": "Ile wynosi suma kątów w trójkącie?",
+      "answer": "180 stopni",
+      "category": "Matematyka"
+    },
+    {
+      "id": 33,
+      "type": "image",
+      "question": "Jaki to pomnik?",
+      "mediaPath": "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg",
+      "answer": "Pomnik Syrenki Warszawskiej",
+      "category": "Kultura"
+    },
+    {
+      "id": 34,
+      "type": "text",
+      "question": "Która planeta jest najbliżej Słońca?",
+      "answer": "Merkury",
+      "category": "Astronomia"
+    },
+    {
+      "id": 35,
+      "type": "audio",
+      "question": "Kto wykonuje ten utwór? (wokal artysty)",
+      "mediaPath": "/media/audio/freddie_mercury.mp3",
+      "answer": "Freddie Mercury / Queen",
+      "category": "Muzyka"
+    },
+    {
+      "id": 36,
+      "type": "text",
+      "question": "W którym roku upadł mur berliński?",
+      "answer": "1989",
+      "category": "Historia"
+    },
+    {
+      "id": 37,
+      "type": "video",
+      "question": "Co to za zjawisko przyrodnicze?",
+      "mediaPath": "/media/video/zorza_polarna.mp4",
+      "answer": "Zorza polarna",
+      "category": "Przyroda"
+    },
+    {
+      "id": 38,
+      "type": "text",
+      "question": "Kto namalował 'Gwiaździstą noc'?",
+      "answer": "Vincent van Gogh",
+      "category": "Sztuka"
+    },
+    {
+      "id": 39,
+      "type": "image",
+      "question": "Z jakiego filmu jest ta scena?",
+      "mediaPath": "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg",
+      "answer": "Matrix",
+      "category": "Film"
+    },
+    {
+      "id": 40,
+      "type": "text",
+      "question": "Jaka jest najwyższa góra świata?",
+      "answer": "Mount Everest",
+      "category": "Geografia"
+    },
+    {
+      "id": 41,
+      "type": "audio",
+      "question": "Jaki to język?",
+      "mediaPath": "/media/audio/jezyk_arabski.mp3",
+      "answer": "Arabski",
+      "category": "Języki"
+    },
+    {
+      "id": 42,
+      "type": "text",
+      "question": "Ile medali zdobyła Polska na Igrzyskach w Tokio 2020?",
+      "answer": "14",
+      "category": "Sport"
+    },
+    {
+      "id": 43,
+      "type": "video",
+      "question": "Co jest produkowane w tym procesie przemysłowym?",
+      "mediaPath": "/media/video/produkcja_szkla.mp4",
+      "answer": "Szkło",
+      "category": "Technika"
+    },
+    {
+      "id": 44,
+      "type": "text",
+      "question": "Kto odkrył Amerykę?",
+      "answer": "Krzysztof Kolumb",
+      "category": "Historia"
+    },
+    {
+      "id": 45,
+      "type": "image",
+      "question": "Jaki to gatunek drzewa?",
+      "mediaPath": "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg",
+      "answer": "Dąb",
+      "category": "Przyroda"
+    },
+    {
+      "id": 46,
+      "type": "text",
+      "question": "Ile stron ma kostka Rubika?",
+      "answer": "6",
+      "category": "Rozrywka"
+    },
+    {
+      "id": 47,
+      "type": "audio",
+      "question": "Jaki to dźwięk zwierzęcia?",
+      "mediaPath": "/media/audio/lew_ryk.mp3",
+      "answer": "Lew",
+      "category": "Przyroda"
+    },
+    {
+      "id": 48,
+      "type": "text",
+      "question": "Który pierwiastek chemiczny ma symbol H?",
+      "answer": "Wodór",
+      "category": "Chemia"
+    },
+    {
+      "id": 49,
+      "type": "video",
+      "question": "Z jakiego kraju pochodzi ten krajobraz?",
+      "mediaPath": "/media/video/safari_afryka.mp4",
+      "answer": "Afryka (Kenya/Tanzania)",
+      "category": "Geografia"
+    },
+    {
+      "id": 50,
+      "type": "text",
+      "question": "Kto był autorem teorii względności?",
+      "answer": "Albert Einstein",
+      "category": "Nauka"
+    }
+  ]
+}
