@@ -1,18 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Team } from '../../lib/types';
-import { GameService } from '../../lib/gameService';
 import { Play, Settings } from 'lucide-react';
 
-interface GameSetupProps {
-  onStart: (teams: Team[]) => void;
-}
-
-const GameSetup: React.FC<GameSetupProps> = ({ onStart }) => {
+const GameSetup = ({ onStart }) => {
   const [teamCount, setTeamCount] = useState(5);
-  const [teamNames, setTeamNames] = useState<string[]>([]);
-  const [teamMembers, setTeamMembers] = useState<number[]>([]);
+  const [teamNames, setTeamNames] = useState([]);
+  const [teamMembers, setTeamMembers] = useState([]);
 
   useEffect(() => {
     setTeamNames(prev =>
@@ -24,18 +18,16 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStart }) => {
   }, [teamCount]);
 
   const handleStart = () => {
-    const teams: Team[] = teamNames.map((name, i) => ({
+    const teams = teamNames.map((name, i) => ({
       id: i + 1,
       name: name || `Drużyna ${i + 1}`,
-      chances: GameService.STAGE1_CHANCES,
+      chances: 3,
       points: 0,
       eliminated: false,
       members: Math.max(1, teamMembers[i] ?? 1)
     }));
     onStart(teams);
   };
-
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-8">
@@ -64,11 +56,11 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStart }) => {
             <label className="block text-white text-xl font-bold mb-3 uppercase tracking-wide">
               Skład drużyn:
             </label>
-            <div className="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
               {teamNames.map((name, i) => (
                 <div
                   key={i}
-                  className="grid grid-cols-[1fr_auto] gap-3 items-center"
+                  className="flex items-center gap-3 bg-gradient-to-r from-gray-900 to-gray-800 border-2 border-gray-700 hover:border-gray-500 rounded-xl p-4 transition-all"
                 >
                   <input
                     type="text"
@@ -81,26 +73,39 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStart }) => {
                       });
                     }}
                     placeholder={`Drużyna ${i + 1}`}
-                    className="w-full px-6 py-3 bg-black border-3 border-gray-600 hover:border-white rounded-xl text-white text-lg font-bold focus:outline-none focus:border-white focus:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all"
+                    className="flex-1 px-4 py-2 bg-black border-2 border-gray-600 hover:border-white rounded-lg text-white text-lg font-bold focus:outline-none focus:border-white focus:shadow-[0_0_15px_rgba(255,255,255,0.2)] transition-all"
                   />
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      min="1"
-                      max="10"
-                      value={teamMembers[i] ?? 1}
-                      onChange={(e) => {
-                        const raw = parseInt(e.target.value, 10);
-                        const value = Math.max(1, Math.min(10, Number.isNaN(raw) ? 1 : raw));
+                  <div className="flex items-center gap-3 bg-black border-2 border-gray-600 rounded-xl px-4 py-2">
+                    <button
+                      type="button"
+                      onClick={() => {
                         setTeamMembers(prev => {
                           const updated = [...prev];
-                          updated[i] = value;
+                          updated[i] = Math.max(1, (prev[i] ?? 1) - 1);
                           return updated;
                         });
                       }}
-                      className="w-24 px-4 py-3 bg-black border-3 border-gray-600 hover:border-white rounded-xl text-white text-lg font-bold focus:outline-none focus:border-white focus:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all text-center"
-                    />
-                    <span className="text-gray-300 text-sm font-semibold uppercase tracking-wide">osób</span>
+                      className="w-8 h-8 flex items-center justify-center bg-gray-700 hover:bg-white hover:text-black text-white font-bold rounded-lg transition-all text-xl"
+                    >
+                      −
+                    </button>
+                    <span className="w-12 text-center text-white text-xl font-bold">
+                      {teamMembers[i] ?? 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTeamMembers(prev => {
+                          const updated = [...prev];
+                          updated[i] = Math.min(10, (prev[i] ?? 1) + 1);
+                          return updated;
+                        });
+                      }}
+                      className="w-8 h-8 flex items-center justify-center bg-gray-700 hover:bg-white hover:text-black text-white font-bold rounded-lg transition-all text-xl"
+                    >
+                      +
+                    </button>
+                    <span className="text-gray-400 text-sm font-semibold ml-1">osób</span>
                   </div>
                 </div>
               ))}
