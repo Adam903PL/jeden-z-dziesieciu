@@ -24,29 +24,28 @@ const FortuneWheel: React.FC<FortuneWheelProps> = ({ teams, onTeamSelected, onFi
 
   const spinWheel = () => {
     if (activeTeams.length === 0 || spinning) return;
-    
+
     setSpinning(true);
     setSelectedTeamId(null);
-    
-    // Losowy indeks drużyny
-    const randomIndex = Math.floor(Math.random() * activeTeams.length);
-    
-    // Obliczamy kąt dla wybranej drużyny
-    const segmentAngle = 360 / activeTeams.length;
+
+    const teamsSnapshot = [...activeTeams];
+    const randomIndex = Math.floor(Math.random() * teamsSnapshot.length);
+    const segmentAngle = 360 / teamsSnapshot.length;
     const targetAngle = randomIndex * segmentAngle + segmentAngle / 2;
-    
-    // Dodajemy 5-7 pełnych obrotów + docelowy kąt
+    const desiredRotation = (360 - targetAngle) % 360;
     const fullSpins = 5 + Math.floor(Math.random() * 3);
-    const finalRotation = fullSpins * 360 + targetAngle;
-    
-    setRotation(finalRotation);
-    
-    // Po zakończeniu animacji
+
+    setRotation(prevRotation => {
+      const normalizedPrev = ((prevRotation % 360) + 360) % 360;
+      const extraRotation = fullSpins * 360 + desiredRotation - normalizedPrev;
+      return prevRotation + extraRotation;
+    });
+
     setTimeout(() => {
-      const selectedTeam = activeTeams[randomIndex];
+      const selectedTeam = teamsSnapshot[randomIndex];
       setSelectedTeamId(selectedTeam.id);
       setSpinning(false);
-      
+
       setTimeout(() => {
         onTeamSelected(selectedTeam.id);
       }, 1000);

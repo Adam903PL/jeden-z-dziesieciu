@@ -9,6 +9,8 @@ interface AnswerPanelProps {
   teams: Team[];
   questionId?: number;
   totalPointsThisTurn: number;
+  showAnswer?: boolean;  // DODAJ TO
+  onToggleAnswer?: () => void;  // DODAJ TO
   onCorrectAnswer: (targetTeamId: number, multiplier: number) => void;
   onWrongAnswer: (pointsLost: number) => void;
   onCancel: () => void;
@@ -20,6 +22,8 @@ const AnswerPanel: React.FC<AnswerPanelProps> = ({
   teams, 
   questionId,
   totalPointsThisTurn,
+  showAnswer,  // DODAJ TO
+  onToggleAnswer,  // DODAJ TO
   onCorrectAnswer, 
   onWrongAnswer,
   onCancel,
@@ -108,6 +112,16 @@ const AnswerPanel: React.FC<AnswerPanelProps> = ({
         <p className="text-xl font-bold">Aktualnie odpowiada:</p>
         <p className="text-2xl font-bold mt-2">{activeTeam.name}</p>
       </div>
+
+      {/* Przycisk do pokazywania/ukrywania odpowiedzi */}
+      {onToggleAnswer && (
+        <button
+          onClick={onToggleAnswer}
+          className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-6 rounded-xl transition-all border-2 border-blue-500 mb-6"
+        >
+          {showAnswer ? '🙈 Ukryj odpowiedź' : '👁️ Pokaż odpowiedź'}
+        </button>
+      )}
 
       {/* Status odpowiedzi */}
       {answerStatus === 'pending' && (

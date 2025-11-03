@@ -11,12 +11,16 @@ interface GameSetupProps {
 
 const GameSetup: React.FC<GameSetupProps> = ({ onStart }) => {
   const [teamCount, setTeamCount] = useState(5);
-  const [membersPerTeam, setMembersPerTeam] = useState(2);
   const [teamNames, setTeamNames] = useState<string[]>([]);
+  const [teamMembers, setTeamMembers] = useState<number[]>([]);
 
   useEffect(() => {
-    const names = Array(teamCount).fill('').map((_, i) => `Drużyna ${i + 1}`);
-    setTeamNames(names);
+    setTeamNames(prev =>
+      Array.from({ length: teamCount }, (_, i) => prev[i] ?? `Drużyna ${i + 1}`)
+    );
+    setTeamMembers(prev =>
+      Array.from({ length: teamCount }, (_, i) => prev[i] ?? 2)
+    );
   }, [teamCount]);
 
   const handleStart = () => {
@@ -26,10 +30,12 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStart }) => {
       chances: GameService.STAGE1_CHANCES,
       points: 0,
       eliminated: false,
-      members: membersPerTeam
+      members: Math.max(1, teamMembers[i] ?? 1)
     }));
     onStart(teams);
   };
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-8">
@@ -56,36 +62,47 @@ const GameSetup: React.FC<GameSetupProps> = ({ onStart }) => {
 
           <div>
             <label className="block text-white text-xl font-bold mb-3 uppercase tracking-wide">
-              Liczba osób w drużynie:
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="10"
-              value={membersPerTeam}
-              onChange={(e) => setMembersPerTeam(Math.max(1, parseInt(e.target.value) || 1))}
-              className="w-full px-6 py-4 bg-black border-4 border-white rounded-xl text-white text-2xl font-bold focus:outline-none focus:border-gray-300 focus:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all"
-            />
-          </div>
-
-          <div>
-            <label className="block text-white text-xl font-bold mb-3 uppercase tracking-wide">
-              Nazwy drużyn:
+              Skład drużyn:
             </label>
             <div className="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
               {teamNames.map((name, i) => (
-                <input
+                <div
                   key={i}
-                  type="text"
-                  value={name}
-                  onChange={(e) => {
-                    const newNames = [...teamNames];
-                    newNames[i] = e.target.value;
-                    setTeamNames(newNames);
-                  }}
-                  placeholder={`Drużyna ${i + 1}`}
-                  className="w-full px-6 py-3 bg-black border-3 border-gray-600 hover:border-white rounded-xl text-white text-lg font-bold focus:outline-none focus:border-white focus:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all"
-                />
+                  className="grid grid-cols-[1fr_auto] gap-3 items-center"
+                >
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => {
+                      setTeamNames(prev => {
+                        const updated = [...prev];
+                        updated[i] = e.target.value;
+                        return updated;
+                      });
+                    }}
+                    placeholder={`Drużyna ${i + 1}`}
+                    className="w-full px-6 py-3 bg-black border-3 border-gray-600 hover:border-white rounded-xl text-white text-lg font-bold focus:outline-none focus:border-white focus:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all"
+                  />
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="1"
+                      max="10"
+                      value={teamMembers[i] ?? 1}
+                      onChange={(e) => {
+                        const raw = parseInt(e.target.value, 10);
+                        const value = Math.max(1, Math.min(10, Number.isNaN(raw) ? 1 : raw));
+                        setTeamMembers(prev => {
+                          const updated = [...prev];
+                          updated[i] = value;
+                          return updated;
+                        });
+                      }}
+                      className="w-24 px-4 py-3 bg-black border-3 border-gray-600 hover:border-white rounded-xl text-white text-lg font-bold focus:outline-none focus:border-white focus:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all text-center"
+                    />
+                    <span className="text-gray-300 text-sm font-semibold uppercase tracking-wide">osób</span>
+                  </div>
+                </div>
               ))}
             </div>
           </div>

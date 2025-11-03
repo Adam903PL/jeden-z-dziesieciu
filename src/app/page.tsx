@@ -33,7 +33,28 @@ export default function Home() {
   const [pointsThisTurn, setPointsThisTurn] = useState(0);
   const [totalPointsThisTurn, setTotalPointsThisTurn] = useState(0);
   const [selfAnswerStreak, setSelfAnswerStreak] = useState(0); // Track consecutive "on myself" answers
+  useEffect(() => {
+    const activeTeamsCount = teams.filter((t) => !t.eliminated).length;
 
+    if ((stage === "stage1" || stage === "stage2") && activeTeamsCount === 2) {
+      // Przejdź do rundy finałowej
+      setTeams(
+        teams.map((t) =>
+          !t.eliminated
+            ? { ...t, chances: GameService.STAGE3_INITIAL_CHANCES }
+            : t
+        )
+      );
+      setStage("stage3-part1");
+      setQuestionCount(0);
+      setActiveTeamId(null);
+      setCurrentQuestion(null);
+      setShowAnswer(false);
+      if (stage === "stage1") {
+        setStage1Phase("wheel");
+      }
+    }
+  }, [teams, stage]);
   // Załadowanie stanu gry z localStorage przy pierwszym renderowaniu
   useEffect(() => {
     const savedGameState = localStorage.getItem("gameState");
@@ -483,6 +504,8 @@ export default function Home() {
                   teams={teams}
                   questionId={currentQuestion?.id}
                   totalPointsThisTurn={totalPointsThisTurn}
+                  showAnswer={showAnswer}  // DODAJ TO
+                  onToggleAnswer={() => setShowAnswer(!showAnswer)}  // DODAJ TO
                   onCorrectAnswer={handleCorrectAnswer}
                   onWrongAnswer={handleWrongAnswer}
                   onCancel={() => setStage1Phase("wheel")}
