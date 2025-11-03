@@ -14,30 +14,26 @@ import { WinnerDisplay } from "./components/game";
 import { FortuneWheel } from "./components/game";
 import { AnswerPanel } from "./components/game";
 
-import { Users, AlertCircle } from "lucide-react";
+import { Users } from "lucide-react";
 
 export default function Home() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [stage, setStage] = useState<GameStage>("setup");
   const [activeTeamId, setActiveTeamId] = useState<number | null>(null);
   const [questionCount, setQuestionCount] = useState(0);
-  const [stage1WrongAnswers, setStage1WrongAnswers] = useState<
-    Record<number, number>
-  >({});
+  const [stage1WrongAnswers, setStage1WrongAnswers] = useState<Record<number, number>>({});
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [usedQuestionIds, setUsedQuestionIds] = useState<number[]>([]);
   const [showAnswer, setShowAnswer] = useState(false);
-  const [stage1Phase, setStage1Phase] = useState<
-    "wheel" | "question" | "answer"
-  >("wheel");
+  const [stage1Phase, setStage1Phase] = useState<"wheel" | "question" | "answer">("wheel");
   const [pointsThisTurn, setPointsThisTurn] = useState(0);
   const [totalPointsThisTurn, setTotalPointsThisTurn] = useState(0);
-  const [selfAnswerStreak, setSelfAnswerStreak] = useState(0); // Track consecutive "on myself" answers
+
+  // --- przejście między etapami ---
   useEffect(() => {
     const activeTeamsCount = teams.filter((t) => !t.eliminated).length;
 
     if ((stage === "stage1" || stage === "stage2") && activeTeamsCount === 2) {
-      // Przejdź do rundy finałowej
       setTeams(
         teams.map((t) =>
           !t.eliminated
@@ -50,25 +46,22 @@ export default function Home() {
       setActiveTeamId(null);
       setCurrentQuestion(null);
       setShowAnswer(false);
-      if (stage === "stage1") {
-        setStage1Phase("wheel");
-      }
+      if (stage === "stage1") setStage1Phase("wheel");
     }
   }, [teams, stage]);
-  // Załadowanie stanu gry z localStorage przy pierwszym renderowaniu
+
+  // --- ładowanie stanu gry ---
   useEffect(() => {
     const savedGameState = localStorage.getItem("gameState");
     if (savedGameState) {
       try {
         const parsedState = JSON.parse(savedGameState);
-        // Sprawdź czy gra nie została już zakończona
         if (parsedState.stage !== "finished") {
           setTeams(parsedState.teams || []);
           setStage(parsedState.stage || "setup");
           setQuestionCount(parsedState.questionCount || 0);
           setStage1WrongAnswers(parsedState.stage1WrongAnswers || {});
           setUsedQuestionIds(parsedState.usedQuestionIds || []);
-          // Nie przywracamy currentQuestion, bo chcemy, aby użytkownik musiał wylosować nowe pytanie
         }
       } catch (e) {
         console.error("Błąd podczas ładowania stanu gry:", e);
@@ -76,9 +69,8 @@ export default function Home() {
     }
   }, []);
 
-  // Zapisywanie stanu gry do localStorage przy każdej zmianie
+  // --- zapisywanie stanu gry ---
   useEffect(() => {
-    // Nie zapisuj stanu gry, jeśli gra została zakończona
     if (stage !== "finished") {
       const gameState = {
         teams,
@@ -91,6 +83,7 @@ export default function Home() {
     }
   }, [teams, stage, questionCount, stage1WrongAnswers, usedQuestionIds]);
 
+  // --- start gry ---
   const handleGameStart = (initialTeams: Team[]) => {
     setTeams(initialTeams);
     setStage("stage1");
@@ -99,10 +92,10 @@ export default function Home() {
       wrongAnswers[team.id] = 0;
     });
     setStage1WrongAnswers(wrongAnswers);
-    // Usuń zapisany stan gry z poprzedniej sesji
     localStorage.removeItem("gameState");
   };
 
+  // --- nowe pytanie ---
   const handleNewQuestion = () => {
     const questions = loadQuestions();
     const question = GameService.getRandomQuestion(questions, usedQuestionIds);
@@ -113,53 +106,38 @@ export default function Home() {
     }
   };
 
+  // --- poprawna odpowiedź ---
   const handleCorrectAnswer = (targetTeamId?: number) => {
     if (!activeTeamId) return;
 
     if (stage === "stage1") {
-      // Obliczamy punkty z mnożnikiem (mnożnik dotyczy TEGO pytania, nie następnego)
-      let pointsToAdd = GameService.POINTS_CORRECT; // bazowe 10 pkt
+      // zawsze +10 pkt za poprawną odpowiedź
+      const pointsToAdd = GameService.POINTS_CORRECT;
 
-      // Jeśli to kolejna odpowiedź "na siebie" w ciągu, stosujemy mnożnik
-      if (targetTeamId === activeTeamId && selfAnswerStreak > 0) {
-        // selfAnswerStreak = ile razy już odpowiedział "na siebie" przed tym pytaniem
-        const multiplier = Math.pow(2, selfAnswerStreak); // 1->2, 2->4, 3->8
-        pointsToAdd = GameService.POINTS_CORRECT * multiplier;
-      }
-
-      // Dodajemy punkty
       setTeams(
         teams.map((t) =>
           t.id === activeTeamId ? { ...t, points: t.points + pointsToAdd } : t
         )
       );
 
-      // Aktualizujemy punkty w tej turze (do ewentualnego odjęcia przy błędzie)
-      setTotalPointsThisTurn((prev) => prev + pointsToAdd);
       setPointsThisTurn(pointsToAdd);
+      setTotalPointsThisTurn((prev) => prev + pointsToAdd);
 
-      // Obsługa dalszego przebiegu gry
       if (targetTeamId === activeTeamId) {
-        // Odpowiedź "na siebie" - zwiększamy streak i kontynuujemy
-        setSelfAnswerStreak((prev) => prev + 1);
+        // bierze na siebie – kontynuuje grę
         setStage1Phase("question");
         handleNewQuestion();
       } else if (targetTeamId) {
-        // Wybrano inną drużynę - resetujemy streak i zmieniamy gracza
-        setSelfAnswerStreak(0);
-        setTotalPointsThisTurn(0); // Resetujemy licznik punktów tury
+        // wskazuje przeciwnika
         setActiveTeamId(targetTeamId);
         setStage1Phase("question");
         handleNewQuestion();
       } else {
-        // Wracamy do koła fortuny
-        setSelfAnswerStreak(0);
-        setTotalPointsThisTurn(0);
+        // wraca do koła
         setStage1Phase("wheel");
         setActiveTeamId(null);
       }
     } else if (stage === "stage3-part1" || stage === "stage3-part2") {
-      // Logika dla etapu 3 pozostaje bez zmian
       setTeams(
         teams.map((t) =>
           t.id === activeTeamId
@@ -180,23 +158,18 @@ export default function Home() {
     setShowAnswer(false);
   };
 
-  const handleWrongAnswer = (pointsLost: number = 0) => {
+  // --- błędna odpowiedź ---
+  const handleWrongAnswer = () => {
     if (!activeTeamId) return;
 
     setTeams(
       teams.map((t) => {
         if (t.id === activeTeamId) {
-          const newChances = t.chances - 1;
-          const eliminated =
-            stage === "stage1"
-              ? (stage1WrongAnswers[t.id] || 0) + 1 >= 3
-              : newChances <= 0;
+          const wrongCount = (stage1WrongAnswers[t.id] || 0) + 1;
+          const eliminated = wrongCount >= 3;
+          const newPoints = Math.max(0, t.points - GameService.POINTS_CORRECT); // -10 pkt
 
-          // Traci punkty zdobyte w tej turze (tylko jeśli są większe niż 0)
-          const pointsToSubtract = pointsLost > 0 ? pointsLost : 0;
-          const newPoints = t.points - pointsToSubtract;
-
-          return { ...t, points: newPoints, chances: newChances, eliminated };
+          return { ...t, points: newPoints, eliminated };
         }
         return t;
       })
@@ -208,13 +181,11 @@ export default function Home() {
         [activeTeamId]: (prev[activeTeamId] || 0) + 1,
       }));
 
-      // W etapie 1 z nową mechaniką, po błędnej odpowiedzi wracamy do koła fortuny
+      // po błędzie wracamy do koła
       setStage1Phase("wheel");
       setActiveTeamId(null);
       setPointsThisTurn(0);
       setTotalPointsThisTurn(0);
-      // Resetujemy streak "na siebie" po błędnej odpowiedzi
-      setSelfAnswerStreak(0);
     }
 
     if (stage === "stage3-part1" || stage === "stage3-part2") {
@@ -228,15 +199,14 @@ export default function Home() {
         questionCount + 1 >= GameService.STAGE3_MAX_QUESTIONS
       ) {
         setStage("finished");
-        // Usuń stan gry po zakończeniu
         localStorage.removeItem("gameState");
       }
     }
 
-    setActiveTeamId(null);
     setShowAnswer(false);
   };
 
+  // --- inne akcje ---
   const handleManualSelectTeam = (teamId: number) => {
     const team = teams.find((t) => t.id === teamId);
     if (!team || team.eliminated) return;
@@ -247,87 +217,11 @@ export default function Home() {
     }
   };
 
-  const handleAdjustTeamPoints = (teamId: number, delta: number) => {
-    if (delta === 0) return;
-
-    setTeams((prevTeams) =>
-      prevTeams.map((t) =>
-        t.id === teamId ? { ...t, points: Math.max(0, t.points + delta) } : t
-      )
-    );
-    setPointsThisTurn(0);
-  };
-
-  const handleRemoveTeam = (teamId: number) => {
-    setTeams((prevTeams) => prevTeams.filter((t) => t.id !== teamId));
-    setStage1WrongAnswers((prev) => {
-      const { [teamId]: _, ...rest } = prev;
-      return rest;
-    });
-
-    if (activeTeamId === teamId) {
-      setActiveTeamId(null);
-      if (stage === "stage1") {
-        setStage1Phase("wheel");
-      }
-    }
-
-    setShowAnswer(false);
-    setPointsThisTurn(0);
-  };
-
-  const handleReviveTeam = (teamId: number) => {
-    setTeams((prevTeams) =>
-      prevTeams.map((t) =>
-        t.id === teamId
-          ? { ...t, eliminated: false, chances: Math.max(t.chances, 3) }
-          : t
-      )
-    );
-    setStage1WrongAnswers((prev) => ({
-      ...prev,
-      [teamId]: 0,
-    }));
-  };
-
-  const handleRemovePoints = (teamId: number, points: number) => {
+  const handleAddPoints = (teamId: number, points: number) => {
     setTeams(
       teams.map((t) =>
-        t.id === teamId ? { ...t, points: Math.max(0, t.points - points) } : t
+        t.id === teamId ? { ...t, points: t.points + points } : t
       )
-    );
-  };
-
-  const handleAddChance = (teamId: number) => {
-    setTeams(
-      teams.map((t) => (t.id === teamId ? { ...t, chances: t.chances + 1 } : t))
-    );
-  };
-
-  const handleRemoveChance = (teamId: number) => {
-    setTeams(
-      teams.map((t) =>
-        t.id === teamId ? { ...t, chances: Math.max(0, t.chances - 1) } : t
-      )
-    );
-  };
-
-  const handleEliminateTeam = (teamId: number) => {
-    setTeams(
-      teams.map((t) => (t.id === teamId ? { ...t, eliminated: true } : t))
-    );
-
-    if (activeTeamId === teamId) {
-      setActiveTeamId(null);
-      if (stage === "stage1") {
-        setStage1Phase("wheel");
-      }
-    }
-  };
-
-  const handleRestoreTeam = (teamId: number) => {
-    setTeams(
-      teams.map((t) => (t.id === teamId ? { ...t, eliminated: false } : t))
     );
   };
 
@@ -356,16 +250,7 @@ export default function Home() {
     }
   };
 
-  const handleAddPoints = (teamId: number, points: number) => {
-    setTeams(
-      teams.map((t) =>
-        t.id === teamId ? { ...t, points: t.points + points } : t
-      )
-    );
-  };
-
   const handleNewGame = () => {
-    // Resetujemy stan gry
     setTeams([]);
     setStage("setup");
     setActiveTeamId(null);
@@ -374,14 +259,11 @@ export default function Home() {
     setCurrentQuestion(null);
     setUsedQuestionIds([]);
     setShowAnswer(false);
-    // Usuwamy zapisany stan gry
     localStorage.removeItem("gameState");
   };
 
   const handleFinishGame = () => {
-    // Ustawiamy stan gry na zakończony
     setStage("finished");
-    // Usuwamy zapisany stan gry
     localStorage.removeItem("gameState");
   };
 
@@ -428,12 +310,6 @@ export default function Home() {
           <p className="text-2xl text-white font-bold uppercase tracking-widest">
             Panel Prowadzącego
           </p>
-          {/* <Link
-            href="/admin"
-            className="mt-4 inline-block bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-all border-2 border-gray-600"
-          >
-            Panel Administracyjny
-          </Link> */}
         </div>
 
         <StageHeader
@@ -448,13 +324,9 @@ export default function Home() {
             onNewGame={handleNewGame}
           />
         ) : stage === "stage1" ? (
-          // Specjalna obsługa etapu 1 z kołem fortuny
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
             <div className="xl:col-span-2 space-y-6">
-              <QuestionDisplay
-                question={currentQuestion}
-                showAnswer={showAnswer}
-              />
+              <QuestionDisplay question={currentQuestion} showAnswer={showAnswer} />
 
               <div className="bg-gradient-to-br from-gray-800 to-gray-900 border-4 border-gray-700 rounded-2xl p-6 shadow-2xl">
                 <div className="flex items-center gap-3 mb-5 pb-4 border-b-2 border-white">
@@ -504,8 +376,8 @@ export default function Home() {
                   teams={teams}
                   questionId={currentQuestion?.id}
                   totalPointsThisTurn={totalPointsThisTurn}
-                  showAnswer={showAnswer}  // DODAJ TO
-                  onToggleAnswer={() => setShowAnswer(!showAnswer)}  // DODAJ TO
+                  showAnswer={showAnswer}
+                  onToggleAnswer={() => setShowAnswer(!showAnswer)}
                   onCorrectAnswer={handleCorrectAnswer}
                   onWrongAnswer={handleWrongAnswer}
                   onCancel={() => setStage1Phase("wheel")}
@@ -528,18 +400,12 @@ export default function Home() {
                   onFinishGame={handleFinishGame}
                 />
               )}
-
-              {/* Panel administracyjny */}
             </div>
           </div>
         ) : (
-          // Standardowa obsługa innych etapów
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
             <div className="xl:col-span-2 space-y-6">
-              <QuestionDisplay
-                question={currentQuestion}
-                showAnswer={showAnswer}
-              />
+              <QuestionDisplay question={currentQuestion} showAnswer={showAnswer} />
 
               <div className="bg-gradient-to-br from-gray-800 to-gray-900 border-4 border-gray-700 rounded-2xl p-6 shadow-2xl">
                 <div className="flex items-center gap-3 mb-5 pb-4 border-b-2 border-white">
@@ -550,12 +416,7 @@ export default function Home() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {teams.map((team) => (
-                    <TeamCard
-                      key={team.id}
-                      team={team}
-                      isActive={team.id === activeTeamId}
-                      stage={stage}
-                    />
+                    <TeamCard key={team.id} team={team} isActive={team.id === activeTeamId} stage={stage} />
                   ))}
                 </div>
               </div>
@@ -577,8 +438,6 @@ export default function Home() {
                 onToggleAnswer={() => setShowAnswer(!showAnswer)}
                 onFinishGame={handleFinishGame}
               />
-
-              {/* Panel administracyjny - moved to /admin route */}
             </div>
           </div>
         )}

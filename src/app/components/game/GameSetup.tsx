@@ -31,7 +31,7 @@ const GameSetup = ({ onStart }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center p-8">
-      <div className="bg-gradient-to-br from-gray-800 to-black border-4 border-white rounded-2xl p-10 max-w-2xl w-full shadow-[0_0_80px_rgba(255,255,255,0.4)]">
+      <div className="bg-gradient-to-br from-gray-800 to-black border-4 border-white rounded-2xl p-10 max-w-2xl w-full min-h-[700px] shadow-[0_0_80px_rgba(255,255,255,0.4)]">
         <div className="flex items-center gap-4 mb-8 pb-6 border-b-4 border-white">
           <Settings className="w-10 h-10 text-white" />
           <h1 className="text-5xl font-bold text-white">KONFIGURACJA</h1>
@@ -42,14 +42,25 @@ const GameSetup = ({ onStart }) => {
             <label className="block text-white text-xl font-bold mb-3 uppercase tracking-wide">
               Liczba drużyn (2-10):
             </label>
-            <input
-              type="number"
-              min="2"
-              max="10"
-              value={teamCount}
-              onChange={(e) => setTeamCount(Math.min(10, Math.max(2, parseInt(e.target.value) || 2)))}
-              className="w-full px-6 py-4 bg-black border-4 border-white rounded-xl text-white text-2xl font-bold focus:outline-none focus:border-gray-300 focus:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all"
-            />
+            <div className="flex items-center justify-center gap-4 bg-black border-4 border-white rounded-xl px-6 py-4">
+              <button
+                type="button"
+                onClick={() => setTeamCount(prev => Math.max(2, prev - 1))}
+                className="w-12 h-12 flex items-center justify-center bg-gray-700 hover:bg-white hover:text-black text-white font-bold rounded-lg transition-all text-2xl"
+              >
+                −
+              </button>
+              <span className="w-16 text-center text-white text-3xl font-bold">
+                {teamCount}
+              </span>
+              <button
+                type="button"
+                onClick={() => setTeamCount(prev => Math.min(10, prev + 1))}
+                className="w-12 h-12 flex items-center justify-center bg-gray-700 hover:bg-white hover:text-black text-white font-bold rounded-lg transition-all text-2xl"
+              >
+                +
+              </button>
+            </div>
           </div>
 
           <div>
