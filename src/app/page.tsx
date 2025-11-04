@@ -165,11 +165,22 @@ export default function Home() {
     setTeams(
       teams.map((t) => {
         if (t.id === activeTeamId) {
-          const wrongCount = (stage1WrongAnswers[t.id] || 0) + 1;
-          const eliminated = wrongCount >= 3;
+          const currentWrongAnswers = stage1WrongAnswers[t.id] || 0;
+          const nextWrongAnswers =
+            stage === "stage1" ? currentWrongAnswers + 1 : currentWrongAnswers;
+          const newChances = Math.max(0, t.chances - 1);
+          const eliminated =
+            stage === "stage1"
+              ? nextWrongAnswers >= GameService.STAGE1_CHANCES
+              : newChances <= 0;
           const newPoints = Math.max(0, t.points - GameService.POINTS_CORRECT); // -10 pkt
 
-          return { ...t, points: newPoints, eliminated };
+          return {
+            ...t,
+            points: newPoints,
+            chances: newChances,
+            eliminated,
+          };
         }
         return t;
       })
