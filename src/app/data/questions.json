@@ -3,376 +3,702 @@
     {
       "id": 1,
       "type": "text",
-      "question": "Jaka jest stolica Polski?",
-      "answer": "Warszawa",
-      "category": "Geografia"
+      "question": "Kiedy obchodzimy Narodowe Święto Niepodległości?",
+      "answer": "11 listopada",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 2,
       "type": "text",
-      "question": "W którym roku odbyły się pierwsze nowożytne igrzyska olimpijskie?",
-      "answer": "1896",
-      "category": "Sport"
+      "question": "W którym roku Polska odzyskała niepodległość?",
+      "answer": "1918",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 3,
-      "type": "image",
-      "question": "Co przedstawia ten obraz?",
-      "mediaPath": "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg",
-      "answer": "Zamek Królewski na Wawelu",
-      "category": "Historia"
+      "type": "text",
+      "question": "Ile lat Polska była pod zaborami?",
+      "answer": "123 lata",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 4,
       "type": "text",
-      "question": "Kto napisał 'Pan Tadeusz'?",
-      "answer": "Adam Mickiewicz",
-      "category": "Literatura"
+      "question": "Kto był Naczelnikiem Państwa po odzyskaniu niepodległości?",
+      "answer": "Józef Piłsudski",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 5,
-      "type": "audio",
-      "question": "Kto jest autorem tego utworu muzycznego?",
-      "mediaPath": "/media/audio/chopin_polonez.mp3",
-      "answer": "Fryderyk Chopin",
-      "category": "Muzyka"
+      "type": "text",
+      "question": "Jakie państwa dokonały rozbiorów Polski?",
+      "answer": "Rosja, Prusy, Austria",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 6,
       "type": "text",
-      "question": "Ile planet znajduje się w Układzie Słonecznym?",
-      "answer": "8",
-      "category": "Astronomia"
+      "question": "Który to był rozbiór, po którym Polska zniknęła z mapy?",
+      "answer": "III rozbiór",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 7,
-      "type": "video",
-      "question": "Jakie miasto jest pokazane w tym filmie?",
-      "mediaPath": "/media/video/krakow_rynek.mp4",
-      "answer": "Kraków",
-      "category": "Geografia"
+      "type": "text",
+      "question": "W którym roku nastąpił III rozbiór Polski?",
+      "answer": "1795",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 8,
       "type": "text",
-      "question": "W którym roku Polska wstąpiła do Unii Europejskiej?",
-      "answer": "2004",
-      "category": "Historia"
+      "question": "Jakie państwo było zaborcą Warszawy przed 1918 rokiem?",
+      "answer": "Rosja",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 9,
-      "type": "image",
-      "question": "Kto to jest? (portret osoby)",
-      "mediaPath": "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg",
-      "answer": "Józef Piłsudski",
-      "category": "Historia"
+      "type": "text",
+      "question": "Jakie barwy ma flaga Polski?",
+      "answer": "biało-czerwona",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 10,
       "type": "text",
-      "question": "Jaki jest pierwiastek chemiczny o symbolu Au?",
-      "answer": "Złoto",
-      "category": "Chemia"
+      "question": "Co symbolizuje kolor biały na fladze Polski?",
+      "answer": "czystość i duchowość",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 11,
-      "type": "audio",
-      "question": "Z jakiego filmu pochodzi ta muzyka?",
-      "mediaPath": "/media/audio/soundtrack_titanic.mp3",
-      "answer": "Titanic",
-      "category": "Film"
+      "type": "text",
+      "question": "Co symbolizuje kolor czerwony na fladze Polski?",
+      "answer": "odwagę i waleczność",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 12,
       "type": "text",
-      "question": "Kto namalował 'Damę z gronostajem'?",
-      "answer": "Leonardo da Vinci",
-      "category": "Sztuka"
+      "question": "Jak nazywa się hymn Polski?",
+      "answer": "Mazurek Dąbrowskiego",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 13,
-      "type": "video",
-      "question": "Jaki sport jest pokazany w tym nagraniu?",
-      "mediaPath": "/media/video/skok_narciarski.mp4",
-      "answer": "Skoki narciarskie",
-      "category": "Sport"
+      "type": "text",
+      "question": "Kto napisał słowa hymnu?",
+      "answer": "Józef Wybicki",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 14,
       "type": "text",
-      "question": "Która rzeka jest najdłuższa w Polsce?",
-      "answer": "Wisła",
-      "category": "Geografia"
+      "question": "Kiedy powstał tekst hymnu?",
+      "answer": "1797",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 15,
-      "type": "image",
-      "question": "Jaki to zabytek?",
-      "mediaPath": "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg",
-      "answer": "Koloseum",
-      "category": "Historia"
+      "type": "text",
+      "question": "Gdzie powstał hymn Polski?",
+      "answer": "we Włoszech",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 16,
       "type": "text",
-      "question": "W którym roku człowiek po raz pierwszy stanął na Księżycu?",
-      "answer": "1969",
-      "category": "Historia"
+      "question": "Jak zaczynają się słowa hymnu?",
+      "answer": "Jeszcze Polska nie zginęła",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 17,
-      "type": "audio",
-      "question": "Jakiego instrumentu słuchasz?",
-      "mediaPath": "/media/audio/skrzypce_solo.mp3",
-      "answer": "Skrzypce",
-      "category": "Muzyka"
+      "type": "text",
+      "question": "Jakie imię nosił generał wymieniony w hymnie?",
+      "answer": "Dąbrowski",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 18,
       "type": "text",
-      "question": "Ile wynosi pierwiastek kwadratowy ze 144?",
-      "answer": "12",
-      "category": "Matematyka"
+      "question": "Jak nazywał się kraj, w którym tworzono Legiony Polskie?",
+      "answer": "Włochy",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 19,
-      "type": "video",
-      "question": "Z jakiego kraju pochodzi ten taniec?",
-      "mediaPath": "/media/video/flamenco.mp4",
-      "answer": "Hiszpania",
-      "category": "Kultura"
+      "type": "text",
+      "question": "Ilu było zaborców Polski?",
+      "answer": "trzech",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 20,
       "type": "text",
-      "question": "Kto był pierwszym prezydentem Polski po 1989 roku?",
-      "answer": "Lech Wałęsa",
-      "category": "Historia"
+      "question": "Jakie miasto było stolicą Polski w 1918 roku?",
+      "answer": "Warszawa",
+      "category": "🇵🇱 Podstawowe pytania"
     },
     {
       "id": 21,
-      "type": "image",
-      "question": "Jaka to flaga państwowa?",
-      "mediaPath": "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg",
-      "answer": "Francja",
-      "category": "Geografia"
+      "type": "text",
+      "question": "Kto przewodniczył rządowi w pierwszych latach niepodległości?",
+      "answer": "Józef Piłsudski",
+      "category": "🧠 Postacie historyczne"
     },
     {
       "id": 22,
       "type": "text",
-      "question": "Ile kontynentów jest na Ziemi?",
-      "answer": "7",
-      "category": "Geografia"
+      "question": "Jakie stanowisko pełnił Piłsudski po 1918 roku?",
+      "answer": "Naczelnik Państwa",
+      "category": "🧠 Postacie historyczne"
     },
     {
       "id": 23,
-      "type": "audio",
-      "question": "Jaki to hymn państwowy?",
-      "mediaPath": "/media/audio/hymn_usa.mp3",
-      "answer": "Hymn Stanów Zjednoczonych",
-      "category": "Muzyka"
+      "type": "text",
+      "question": "Kto był premierem Polski w 1918 roku?",
+      "answer": "Jędrzej Moraczewski",
+      "category": "🧠 Postacie historyczne"
     },
     {
       "id": 24,
       "type": "text",
-      "question": "Kto wynalazł żarówkę?",
-      "answer": "Thomas Edison",
-      "category": "Nauka"
+      "question": "Kto był królem Polski podczas I rozbioru?",
+      "answer": "Stanisław August Poniatowski",
+      "category": "🧠 Postacie historyczne"
     },
     {
       "id": 25,
-      "type": "video",
-      "question": "Jakie zwierzę jest pokazane w tym filmie?",
-      "mediaPath": "/media/video/panda.mp4",
-      "answer": "Panda wielka",
-      "category": "Przyroda"
+      "type": "text",
+      "question": "Kto dowodził Legionami Polskimi?",
+      "answer": "Józef Piłsudski",
+      "category": "🧠 Postacie historyczne"
     },
     {
       "id": 26,
       "type": "text",
-      "question": "W którym mieście znajduje się Statua Wolności?",
-      "answer": "Nowy Jork",
-      "category": "Geografia"
+      "question": "Jak nazywał się poeta, który napisał \"Rota\"?",
+      "answer": "Maria Konopnicka",
+      "category": "🧠 Postacie historyczne"
     },
     {
       "id": 27,
-      "type": "image",
-      "question": "Kto to jest? (zdjęcie naukowca)",
-      "mediaPath": "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg",
-      "answer": "Albert Einstein",
-      "category": "Nauka"
+      "type": "text",
+      "question": "Kto był kompozytorem muzyki do \"Roty\"?",
+      "answer": "Feliks Nowowiejski",
+      "category": "🧠 Postacie historyczne"
     },
     {
       "id": 28,
       "type": "text",
-      "question": "Ile serc ma ośmiornica?",
-      "answer": "3",
-      "category": "Przyroda"
+      "question": "Kto powiedział słowa \"Niepodległość nie jest dana raz na zawsze\"?",
+      "answer": "Józef Piłsudski",
+      "category": "🧠 Postacie historyczne"
     },
     {
       "id": 29,
-      "type": "audio",
-      "question": "Z jakiego filmu pochodzi ta czołówka muzyczna?",
-      "mediaPath": "/media/audio/star_wars_theme.mp3",
-      "answer": "Gwiezdne Wojny",
-      "category": "Film"
+      "type": "text",
+      "question": "Kto był prezydentem RP w 1926 roku?",
+      "answer": "Ignacy Mościcki",
+      "category": "🧠 Postacie historyczne"
     },
     {
       "id": 30,
       "type": "text",
-      "question": "Kto napisał 'Dziady'?",
-      "answer": "Adam Mickiewicz",
-      "category": "Literatura"
+      "question": "Kto był marszałkiem Sejmu Ustawodawczego w 1919 roku?",
+      "answer": "Wojciech Trąmpczyński",
+      "category": "🧠 Postacie historyczne"
     },
     {
       "id": 31,
-      "type": "video",
-      "question": "Jaki to taniec ludowy?",
-      "mediaPath": "/media/video/mazur.mp4",
-      "answer": "Mazur",
-      "category": "Kultura"
+      "type": "text",
+      "question": "W jakim dniu Józef Piłsudski wrócił do Warszawy z Magdeburga?",
+      "answer": "10 listopada 1918",
+      "category": "🗓️ Wydarzenia i fakty historyczne"
     },
     {
       "id": 32,
       "type": "text",
-      "question": "Ile wynosi suma kątów w trójkącie?",
-      "answer": "180 stopni",
-      "category": "Matematyka"
+      "question": "W jakim dniu przekazano mu władzę wojskową?",
+      "answer": "11 listopada 1918",
+      "category": "🗓️ Wydarzenia i fakty historyczne"
     },
     {
       "id": 33,
-      "type": "image",
-      "question": "Jaki to pomnik?",
-      "mediaPath": "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg",
-      "answer": "Pomnik Syrenki Warszawskiej",
-      "category": "Kultura"
+      "type": "text",
+      "question": "Jakie wydarzenie na Zachodzie Europy zakończyło I wojnę światową?",
+      "answer": "zawieszenie broni w Compiegne",
+      "category": "🗓️ Wydarzenia i fakty historyczne"
     },
     {
       "id": 34,
       "type": "text",
-      "question": "Która planeta jest najbliżej Słońca?",
-      "answer": "Merkury",
-      "category": "Astronomia"
+      "question": "Kiedy zakończyła się I wojna światowa?",
+      "answer": "11 listopada 1918",
+      "category": "🗓️ wydarzenia i fakty historyczne"
     },
     {
       "id": 35,
-      "type": "audio",
-      "question": "Kto wykonuje ten utwór? (wokal artysty)",
-      "mediaPath": "/media/audio/freddie_mercury.mp3",
-      "answer": "Freddie Mercury / Queen",
-      "category": "Muzyka"
+      "type": "text",
+      "question": "Jakie państwo przegrało I wojnę światową?",
+      "answer": "Niemcy",
+      "category": "🗓️ Wydarzenia i fakty historyczne"
     },
     {
       "id": 36,
       "type": "text",
-      "question": "W którym roku upadł mur berliński?",
-      "answer": "1989",
-      "category": "Historia"
+      "question": "Jakie wydarzenie historyczne umożliwiło Polsce odzyskanie niepodległości?",
+      "answer": "klęska zaborców w I wojnie światowej",
+      "category": "🗓️ Wydarzenia i fakty historyczne"
     },
     {
       "id": 37,
-      "type": "video",
-      "question": "Co to za zjawisko przyrodnicze?",
-      "mediaPath": "/media/video/zorza_polarna.mp4",
-      "answer": "Zorza polarna",
-      "category": "Przyroda"
+      "type": "text",
+      "question": "Jak nazywał się niemiecki obóz, w którym był więziony Piłsudski?",
+      "answer": "Magdeburg",
+      "category": "🗓️ Wydarzenia i fakty historyczne"
     },
     {
       "id": 38,
       "type": "text",
-      "question": "Kto namalował 'Gwiaździstą noc'?",
-      "answer": "Vincent van Gogh",
-      "category": "Sztuka"
+      "question": "Jakie miasto było siedzibą rządu lubelskiego w 1918 roku?",
+      "answer": "Lublin",
+      "category": "🗓️ Wydarzenia i fakty historyczne"
     },
     {
       "id": 39,
-      "type": "image",
-      "question": "Z jakiego filmu jest ta scena?",
-      "mediaPath": "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg",
-      "answer": "Matrix",
-      "category": "Film"
+      "type": "text",
+      "question": "Jaką nazwę nosiła pierwsza polska konstytucja po odzyskaniu niepodległości?",
+      "answer": "Konstytucja marcowa",
+      "category": "🗓️ Wydarzenia i fakty historyczne"
     },
     {
       "id": 40,
       "type": "text",
-      "question": "Jaka jest najwyższa góra świata?",
-      "answer": "Mount Everest",
-      "category": "Geografia"
+      "question": "W którym roku ją uchwalono?",
+      "answer": "1921",
+      "category": "🗓️ Wydarzenia i fakty historyczne"
     },
     {
       "id": 41,
-      "type": "audio",
-      "question": "Jaki to język?",
-      "mediaPath": "/media/audio/jezyk_arabski.mp3",
-      "answer": "Arabski",
-      "category": "Języki"
+      "type": "text",
+      "question": "Które państwo graniczyło z Polską od zachodu po 1918 roku?",
+      "answer": "Niemcy",
+      "category": "🇪🇺 Polska w Europie"
     },
     {
       "id": 42,
       "type": "text",
-      "question": "Ile medali zdobyła Polska na Igrzyskach w Tokio 2020?",
-      "answer": "14",
-      "category": "Sport"
+      "question": "Które od wschodu?",
+      "answer": "Sowiecka Rosja",
+      "category": "🇪🇺 Polska w Europie"
     },
     {
       "id": 43,
-      "type": "video",
-      "question": "Co jest produkowane w tym procesie przemysłowym?",
-      "mediaPath": "/media/video/produkcja_szkla.mp4",
-      "answer": "Szkło",
-      "category": "Technika"
+      "type": "text",
+      "question": "Które od południa?",
+      "answer": "Czechosłowacja",
+      "category": "🇪🇺 Polska w Europie"
     },
     {
       "id": 44,
       "type": "text",
-      "question": "Kto odkrył Amerykę?",
-      "answer": "Krzysztof Kolumb",
-      "category": "Historia"
+      "question": "Które od północy?",
+      "answer": "Wolne Miasto Gdańsk / Morze Bałtyckie",
+      "category": "🇪🇺 Polska w Europie"
     },
     {
       "id": 45,
-      "type": "image",
-      "question": "Jaki to gatunek drzewa?",
-      "mediaPath": "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg",
-      "answer": "Dąb",
-      "category": "Przyroda"
+      "type": "text",
+      "question": "W jakim roku odbyła się wojna polsko-bolszewicka?",
+      "answer": "1920",
+      "category": "🇪🇺 Polska w Europie"
     },
     {
       "id": 46,
       "type": "text",
-      "question": "Ile stron ma kostka Rubika?",
-      "answer": "6",
-      "category": "Rozrywka"
+      "question": "Kto dowodził w Bitwie Warszawskiej?",
+      "answer": "Józef Piłsudski",
+      "category": "🇪🇺 Polska w Europie"
     },
     {
       "id": 47,
-      "type": "audio",
-      "question": "Jaki to dźwięk zwierzęcia?",
-      "mediaPath": "/media/audio/lew_ryk.mp3",
-      "answer": "Lew",
-      "category": "Przyroda"
+      "type": "text",
+      "question": "Jak nazwano Bitwę Warszawską 1920 roku?",
+      "answer": "Cud nad Wisłą",
+      "category": "🇪🇺 Polska w Europie"
     },
     {
       "id": 48,
       "type": "text",
-      "question": "Który pierwiastek chemiczny ma symbol H?",
-      "answer": "Wodór",
-      "category": "Chemia"
+      "question": "Kiedy podpisano pokój w Rydze kończący wojnę z bolszewikami?",
+      "answer": "1921",
+      "category": "🇪🇺 Polska w Europie"
     },
     {
       "id": 49,
-      "type": "video",
-      "question": "Z jakiego kraju pochodzi ten krajobraz?",
-      "mediaPath": "/media/video/safari_afryka.mp4",
-      "answer": "Afryka (Kenya/Tanzania)",
-      "category": "Geografia"
+      "type": "text",
+      "question": "Jakie miasto było wtedy stolicą Rosji Radzieckiej?",
+      "answer": "Moskwa",
+      "category": "🇪🇺 Polska w Europie"
     },
     {
       "id": 50,
       "type": "text",
-      "question": "Kto był autorem teorii względności?",
-      "answer": "Albert Einstein",
-      "category": "Nauka"
+      "question": "W którym roku Polska wstąpiła do Ligi Narodów?",
+      "answer": "1920",
+      "category": "🇪🇺 Polska w Europie"
+    },
+    {
+      "id": 51,
+      "type": "text",
+      "question": "Jakie zwierzę znajduje się w godle Polski?",
+      "answer": "orzeł",
+      "category": "🏛️ Symbole narodowe i patriotyzm"
+    },
+    {
+      "id": 52,
+      "type": "text",
+      "question": "Jakiego koloru jest orzeł w godle Polski?",
+      "answer": "biały",
+      "category": "🏛️ Symbole narodowe i patriotyzm"
+    },
+    {
+      "id": 53,
+      "type": "text",
+      "question": "Co ma na głowie orzeł w godle?",
+      "answer": "złotą koronę",
+      "category": "🏛️ Symbole narodowe i patriotyzm"
+    },
+    {
+      "id": 54,
+      "type": "text",
+      "question": "Jakie święto narodowe obchodzimy 3 maja?",
+      "answer": "Święto Konstytucji 3 maja",
+      "category": "🏛️ Symbole narodowe i patriotyzm"
+    },
+    {
+      "id": 55,
+      "type": "text",
+      "question": "Jakie święto obchodzimy 1 maja?",
+      "answer": "Święto Pracy",
+      "category": "🏛️ Symbole narodowe i patriotyzm"
+    },
+    {
+      "id": 56,
+      "type": "text",
+      "question": "Jakie święto obchodzimy 2 maja?",
+      "answer": "Dzień Flagi RP",
+      "category": "🏛️ Symbole narodowe i patriotyzm"
+    },
+    {
+      "id": 57,
+      "type": "text",
+      "question": "Co oznacza skrót \"RP\"?",
+      "answer": "Rzeczpospolita Polska",
+      "category": "🏛️ Symbole narodowe i patriotyzm"
+    },
+    {
+      "id": 58,
+      "type": "text",
+      "question": "Jakie są trzy symbole narodowe Polski?",
+      "answer": "flaga, godło, hymn",
+      "category": "🏛️ Symbole narodowe i patriotyzm"
+    },
+    {
+      "id": 59,
+      "type": "text",
+      "question": "Kiedy obchodzimy Dzień Flagi RP?",
+      "answer": "2 maja",
+      "category": "🏛️ Symbole narodowe i patriotyzm"
+    },
+    {
+      "id": 60,
+      "type": "text",
+      "question": "Jak nazywa się dokument założycielski II Rzeczypospolitej?",
+      "answer": "Manifest rządu lubelskiego",
+      "category": "🏛️ Symbole narodowe i patriotyzm"
+    },
+    {
+      "id": 61,
+      "type": "text",
+      "question": "Jak brzmi drugie zdanie hymnu Polski?",
+      "answer": "Kiedy my żyjemy",
+      "category": "🎶 Kultura, pieśni i tradycje"
+    },
+    {
+      "id": 62,
+      "type": "text",
+      "question": "Jakie miasto wymienione jest w hymnie?",
+      "answer": "Poznań",
+      "category": "🎶 Kultura, pieśni i tradycje"
+    },
+    {
+      "id": 63,
+      "type": "text",
+      "question": "Jakie imię nosił bohater, który \"wracał z ziemi włoskiej do Polski\"?",
+      "answer": "Dąbrowski",
+      "category": "🎶 Kultura, pieśni i tradycje"
+    },
+    {
+      "id": 64,
+      "type": "text",
+      "question": "Jak nazywa się pieśń patriotyczna zaczynająca się od słów \"Nie rzucim ziemi, skąd nasz ród\"?",
+      "answer": "Rota",
+      "category": "🎶 Kultura, pieśni i tradycje"
+    },
+    {
+      "id": 65,
+      "type": "text",
+      "question": "Jakie hasło widnieje na polskich sztandarach wojskowych?",
+      "answer": "Bóg, Honor, Ojczyzna",
+      "category": "🎶 Kultura, pieśni i tradycje"
+    },
+    {
+      "id": 66,
+      "type": "text",
+      "question": "Kiedy obchodzimy Święto Wojska Polskiego?",
+      "answer": "15 sierpnia",
+      "category": "🎶 Kultura, pieśni i tradycje"
+    },
+    {
+      "id": 67,
+      "type": "text",
+      "question": "Co to jest \"biało-czerwony\" pochód?",
+      "answer": "patriotyczny marsz / przemarsz z flagami",
+      "category": "🎶 Kultura, pieśni i tradycje"
+    },
+    {
+      "id": 68,
+      "type": "text",
+      "question": "Jakiego koloru wstążki nosi się w dniu niepodległości?",
+      "answer": "biało-czerwone",
+      "category": "🎶 Kultura, pieśni i tradycje"
+    },
+    {
+      "id": 69,
+      "type": "text",
+      "question": "Jakie słowo oznacza przywiązanie do ojczyzny?",
+      "answer": "patriotyzm",
+      "category": "🎶 Kultura, pieśni i tradycje"
+    },
+    {
+      "id": 70,
+      "type": "text",
+      "question": "Jak nazywa się uroczysty apel w dniu 11 listopada?",
+      "answer": "apel niepodległościowy",
+      "category": "🎶 Kultura, pieśni i tradycje"
+    },
+    {
+      "id": 71,
+      "type": "text",
+      "question": "Które morze leży na północy Polski?",
+      "answer": "Bałtyk",
+      "category": "📚 Ciekawostki i geografia"
+    },
+    {
+      "id": 72,
+      "type": "text",
+      "question": "W jakim mieście znajduje się Wawel?",
+      "answer": "Kraków",
+      "category": "📚 Ciekawostki i geografia"
+    },
+    {
+      "id": 73,
+      "type": "text",
+      "question": "Gdzie pochowany jest Józef Piłsudski?",
+      "answer": "na Wawelu",
+      "category": "📚 Ciekawostki i geografia"
+    },
+    {
+      "id": 74,
+      "type": "text",
+      "question": "Jakie miasto było dawną stolicą Polski?",
+      "answer": "Kraków",
+      "category": "📚 Ciekawostki i geografia"
+    },
+    {
+      "id": 75,
+      "type": "text",
+      "question": "Gdzie znajduje się grób Nieznanego Żołnierza?",
+      "answer": "Warszawa",
+      "category": "📚 Ciekawostki i geografia"
+    },
+    {
+      "id": 76,
+      "type": "text",
+      "question": "Jak nazywa się główna ulica w Warszawie, przy której leży grób Nieznanego Żołnierza?",
+      "answer": "Krakowskie Przedmieście",
+      "category": "📚 Ciekawostki i geografia"
+    },
+    {
+      "id": 77,
+      "type": "text",
+      "question": "W którym województwie leży Warszawa?",
+      "answer": "mazowieckie",
+      "category": "📚 Ciekawostki i geografia"
+    },
+    {
+      "id": 78,
+      "type": "text",
+      "question": "W którym województwie leży Kraków?",
+      "answer": "małopolskie",
+      "category": "📚 Ciekawostki i geografia"
+    },
+    {
+      "id": 79,
+      "type": "text",
+      "question": "Które góry znajdują się na południu Polski?",
+      "answer": "Tatry",
+      "category": "📚 Ciekawostki i geografia"
+    },
+    {
+      "id": 80,
+      "type": "text",
+      "question": "Jak nazywa się największa rzeka Polski?",
+      "answer": "Wisła",
+      "category": "📚 Ciekawostki i geografia"
+    },
+    {
+      "id": 81,
+      "type": "text",
+      "question": "Co to znaczy \"niepodległość\"?",
+      "answer": "wolność, samodzielność państwa",
+      "category": "🏫 Wiedza szkolna"
+    },
+    {
+      "id": 82,
+      "type": "text",
+      "question": "Jakie kolory ma flaga Polski?",
+      "answer": "biały i czerwony",
+      "category": "🏫 Wiedza szkolna"
+    },
+    {
+      "id": 83,
+      "type": "text",
+      "question": "Jak nazywa się nasze państwo?",
+      "answer": "Polska",
+      "category": "🏫 Wiedza szkolna"
+    },
+    {
+      "id": 84,
+      "type": "text",
+      "question": "Jak nazywa się stolica Polski?",
+      "answer": "Warszawa",
+      "category": "🏫 Wiedza szkolna"
+    },
+    {
+      "id": 85,
+      "type": "text",
+      "question": "Jak nazywamy mieszkańców Polski?",
+      "answer": "Polacy",
+      "category": "🏫 Wiedza szkolna"
+    },
+    {
+      "id": 86,
+      "type": "text",
+      "question": "Co robimy w czasie hymnu?",
+      "answer": "stoimy na baczność",
+      "category": "🏫 Wiedza szkolna"
+    },
+    {
+      "id": 87,
+      "type": "text",
+      "question": "Co oznacza słowo \"ojczyzna\"?",
+      "answer": "kraj, z którego pochodzimy",
+      "category": "🏫 Wiedza szkolna"
+    },
+    {
+      "id": 88,
+      "type": "text",
+      "question": "Jak nazywamy dzień 11 listopada?",
+      "answer": "Święto Niepodległości",
+      "category": "🏫 Wiedza szkolna"
+    },
+    {
+      "id": 89,
+      "type": "text",
+      "question": "Jak nazywa się polska flaga z poziomymi pasami?",
+      "answer": "biało-czerwona",
+      "category": "🏫 Wiedza szkolna"
+    },
+    {
+      "id": 90,
+      "type": "text",
+      "question": "Jak nazywamy uczucie dumy z Polski?",
+      "answer": "patriotyzm",
+      "category": "🏫 Wiedza szkolna"
+    },
+    {
+      "id": 91,
+      "type": "text",
+      "question": "W którym roku podpisano traktat wersalski?",
+      "answer": "1919",
+      "category": "🧩 Trudniejsze pytania"
+    },
+    {
+      "id": 92,
+      "type": "text",
+      "question": "Kto reprezentował Polskę na konferencji wersalskiej?",
+      "answer": "Roman Dmowski i Ignacy Paderewski",
+      "category": "🧩 Trudniejsze pytania"
+    },
+    {
+      "id": 93,
+      "type": "text",
+      "question": "Jak nazywała się Polska Partia Socjalistyczna, z którą związany był Piłsudski?",
+      "answer": "PPS",
+      "category": "🧩 Trudniejsze pytania"
+    },
+    {
+      "id": 94,
+      "type": "text",
+      "question": "Jak nazywała się waluta wprowadzona po odzyskaniu niepodległości?",
+      "answer": "złoty",
+      "category": "🧩 Trudniejsze pytania"
+    },
+    {
+      "id": 95,
+      "type": "text",
+      "question": "Kiedy wprowadzono złotego?",
+      "answer": "1924",
+      "category": "🧩 Trudniejsze pytania"
+    },
+    {
+      "id": 96,
+      "type": "text",
+      "question": "Kto był premierem, gdy wprowadzano złotego?",
+      "answer": "Władysław Grabski",
+      "category": "🧩 Trudniejsze pytania"
+    },
+    {
+      "id": 97,
+      "type": "text",
+      "question": "Kiedy Polska odzyskała Pomorze i dostęp do morza?",
+      "answer": "1920",
+      "category": "🧩 Trudniejsze pytania"
+    },
+    {
+      "id": 98,
+      "type": "text",
+      "question": "Jakie miasto nazwano \"miastem wolności\" po 1918 roku?",
+      "answer": "Gdańsk",
+      "category": "🧩 Trudniejsze pytania"
+    },
+    {
+      "id": 99,
+      "type": "text",
+      "question": "Kto był pierwszym prezydentem II RP?",
+      "answer": "Gabriel Narutowicz",
+      "category": "🧩 Trudniejsze pytania"
+    },
+    {
+      "id": 100,
+      "type": "text",
+      "question": "W którym roku zginął Gabriel Narutowicz?",
+      "answer": "1922",
+      "category": "🧩 Trudniejsze pytania"
     }
   ]
 }

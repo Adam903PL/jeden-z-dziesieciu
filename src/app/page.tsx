@@ -28,12 +28,14 @@ export default function Home() {
   const [stage1Phase, setStage1Phase] = useState<"wheel" | "question" | "answer">("wheel");
   const [pointsThisTurn, setPointsThisTurn] = useState(0);
   const [totalPointsThisTurn, setTotalPointsThisTurn] = useState(0);
+  const [initialTeamCount, setInitialTeamCount] = useState(0);
 
   // --- przejście między etapami ---
   useEffect(() => {
     const activeTeamsCount = teams.filter((t) => !t.eliminated).length;
+    const stage3Limit = GameService.getStage3Threshold(initialTeamCount);
 
-    if ((stage === "stage1" || stage === "stage2") && activeTeamsCount === 2) {
+    if ((stage === "stage1" || stage === "stage2") && activeTeamsCount <= stage3Limit) {
       setTeams(
         teams.map((t) =>
           !t.eliminated
@@ -86,11 +88,11 @@ export default function Home() {
   // --- start gry ---
   const handleGameStart = (initialTeams: Team[]) => {
     setTeams(initialTeams);
+    setInitialTeamCount(initialTeams.length); // <= zapisujemy ilość startowych
     setStage("stage1");
+  
     const wrongAnswers: Record<number, number> = {};
-    initialTeams.forEach((team) => {
-      wrongAnswers[team.id] = 0;
-    });
+    initialTeams.forEach(team => wrongAnswers[team.id] = 0);
     setStage1WrongAnswers(wrongAnswers);
     localStorage.removeItem("gameState");
   };
@@ -109,22 +111,12 @@ export default function Home() {
   // --- poprawna odpowiedź ---
   const handleCorrectAnswer = (targetTeamId?: number) => {
     if (!activeTeamId) return;
-
+  
+    // === STAGE 1 ===
     if (stage === "stage1") {
-      // zawsze +10 pkt za poprawną odpowiedź
-      const pointsToAdd = GameService.POINTS_CORRECT;
-
-      setTeams(
-        teams.map((t) =>
-          t.id === activeTeamId ? { ...t, points: t.points + pointsToAdd } : t
-        )
-      );
-
-      setPointsThisTurn(pointsToAdd);
-      setTotalPointsThisTurn((prev) => prev + pointsToAdd);
-
+      // ❌ W tym etapie nie przyznajemy punktów
       if (targetTeamId === activeTeamId) {
-        // bierze na siebie – kontynuuje grę
+        // drużyna odpowiada sama — kontynuuje grę
         setStage1Phase("question");
         handleNewQuestion();
       } else if (targetTeamId) {
@@ -133,11 +125,26 @@ export default function Home() {
         setStage1Phase("question");
         handleNewQuestion();
       } else {
-        // wraca do koła
+        // powrót do koła fortuny
         setStage1Phase("wheel");
         setActiveTeamId(null);
       }
-    } else if (stage === "stage3-part1" || stage === "stage3-part2") {
+  
+      setShowAnswer(false);
+      return;
+    }
+  
+    // === STAGE 2 ===
+    if (stage === "stage2") {
+      // ❌ W tym etapie również brak punktów
+      setActiveTeamId(null);
+      setShowAnswer(false);
+      return;
+    }
+  
+    // === STAGE 3 === (część 1 i 2)
+    if (stage === "stage3-part1" || stage === "stage3-part2") {
+      // ✅ Tutaj przyznajemy punkty za poprawną odpowiedź
       setTeams(
         teams.map((t) =>
           t.id === activeTeamId
@@ -145,19 +152,20 @@ export default function Home() {
             : t
         )
       );
+  
       setQuestionCount((prev) => prev + 1);
-
+  
+      // jeśli skończyły się pytania — koniec gry
       if (questionCount + 1 >= GameService.STAGE3_MAX_QUESTIONS) {
         setStage("finished");
         localStorage.removeItem("gameState");
       }
-
+  
       setActiveTeamId(null);
+      setShowAnswer(false);
     }
-
-    setShowAnswer(false);
   };
-
+  
   // --- błędna odpowiedź ---
   const handleWrongAnswer = () => {
     if (!activeTeamId) return;

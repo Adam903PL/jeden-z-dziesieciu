@@ -4,10 +4,15 @@ export class GameService {
   static readonly STAGE1_CHANCES = 3;
   static readonly STAGE2_INITIAL_CHANCES = 3;
   static readonly STAGE3_INITIAL_CHANCES = 3;
-  static readonly STAGE3_MAX_QUESTIONS = 40;
+  static readonly STAGE3_MAX_QUESTIONS = 30;
   static readonly POINTS_CORRECT = 10;
   static readonly POINTS_SELF_ANSWER = 20;
   static readonly POINTS_PER_CHANCE = 10;
+
+  // --- Nowe: ile drużyn przechodzi do Stage3 w zależności od liczby startujących ---
+  static getStage3Threshold(initialTeamsCount: number): number {
+    return Math.max(2, Math.ceil(initialTeamsCount * 0.2)); // 20% drużyn, minimum 2
+  }
 
   static checkStage1Elimination(wrongAnswers: number): boolean {
     return wrongAnswers >= 3;
@@ -21,8 +26,9 @@ export class GameService {
     return teams.filter(t => !t.eliminated).length <= 10;
   }
 
-  static shouldProgressToStage3(teams: Team[]): boolean {
-    return teams.filter(t => !t.eliminated).length <= 3;
+  // --- Zmieniono: dynamiczny próg Stage3 ---
+  static shouldProgressToStage3(teams: Team[], initialTeamsCount: number): boolean {
+    return teams.filter(t => !t.eliminated).length <= this.getStage3Threshold(initialTeamsCount);
   }
 
   static calculateFinalScore(team: Team): number {
@@ -35,6 +41,7 @@ export class GameService {
     return available[Math.floor(Math.random() * available.length)];
   }
 }
+
 
 export const GAME_CONSTANTS = {
   STAGE1_CHANCES: GameService.STAGE1_CHANCES,
