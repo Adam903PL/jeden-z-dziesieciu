@@ -6,7 +6,7 @@ export class GameService {
   static readonly STAGE3_INITIAL_CHANCES = 3;
   static readonly STAGE3_MAX_QUESTIONS = 30;
   static readonly POINTS_CORRECT = 10;
-  static readonly POINTS_SELF_ANSWER = 20;
+  static readonly POINTS_SELF_ANSWER = 10;
   static readonly POINTS_PER_CHANCE = 10;
 
   // --- Nowe: ile drużyn przechodzi do Stage3 w zależności od liczby startujących ---

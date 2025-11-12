@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Question } from '../../lib/types';
-import { Image, Music, Video } from 'lucide-react';
+import { Image as ImageIcon, Music, Video } from 'lucide-react';
 
 interface MediaDisplayProps {
   question: Question;
@@ -12,7 +12,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({ question }) => {
   if (question.type === 'text') return null;
 
   const iconMap = {
-    image: <Image className="w-20 h-20 text-white" />,
+    image: <ImageIcon className="w-20 h-20 text-white" />,
     audio: <Music className="w-20 h-20 text-white" />,
     video: <Video className="w-20 h-20 text-white" />
   };

@@ -5,6 +5,7 @@ export interface Team {
   points: number;
   eliminated: boolean;
   members: number;
+  preFinalPoints?: number;
 }
 
 export type GameStage = 'setup' | 'stage1' | 'stage2' | 'stage3-part1' | 'stage3-part2' | 'finished';
@@ -18,4 +19,9 @@ export interface Question {
   mediaPath?: string;
   answer: string;
   category?: string;
+}
+
+export interface GameConfig {
+  stage1QuestionLimit: number;
+  finalQuestionLimit: number;
 }

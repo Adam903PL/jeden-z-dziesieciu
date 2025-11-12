@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { Team, GameStage, Question } from "./lib";
+import { Team, GameStage, Question, GameConfig } from "./lib";
 import { GameService } from "./lib";
 import { loadQuestions } from "./data";
 import { GameSetup } from "./components/game";
@@ -16,6 +16,11 @@ import { AnswerPanel } from "./components/game";
 
 import { Users } from "lucide-react";
 
+const DEFAULT_GAME_CONFIG: GameConfig = {
+  stage1QuestionLimit: 30,
+  finalQuestionLimit: GameService.STAGE3_MAX_QUESTIONS,
+};
+
 export default function Home() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [stage, setStage] = useState<GameStage>("setup");
@@ -28,29 +33,102 @@ export default function Home() {
   const [stage1Phase, setStage1Phase] = useState<"wheel" | "question" | "answer">("wheel");
   const [pointsThisTurn, setPointsThisTurn] = useState(0);
   const [totalPointsThisTurn, setTotalPointsThisTurn] = useState(0);
-  const [initialTeamCount, setInitialTeamCount] = useState(0);
+  const [gameConfig, setGameConfig] = useState<GameConfig>(DEFAULT_GAME_CONFIG);
+  const [stage1QuestionsResolved, setStage1QuestionsResolved] = useState(0);
+  const [stage1SelfStreaks, setStage1SelfStreaks] = useState<Record<number, number>>({});
 
-  // --- przejście między etapami ---
-  useEffect(() => {
-    const activeTeamsCount = teams.filter((t) => !t.eliminated).length;
-    const stage3Limit = GameService.getStage3Threshold(initialTeamCount);
+  const finalQuestionLimit =
+    gameConfig?.finalQuestionLimit ?? GameService.STAGE3_MAX_QUESTIONS;
 
-    if ((stage === "stage1" || stage === "stage2") && activeTeamsCount <= stage3Limit) {
-      setTeams(
-        teams.map((t) =>
-          !t.eliminated
-            ? { ...t, chances: GameService.STAGE3_INITIAL_CHANCES }
-            : t
-        )
+  const resetTurnPoints = () => {
+    setPointsThisTurn(0);
+    setTotalPointsThisTurn(0);
+  };
+
+  const applyPointsToTeam = (teamId: number, delta: number) => {
+    if (!delta) return;
+    setTeams((prevTeams) =>
+      prevTeams.map((team) =>
+        team.id === teamId
+          ? { ...team, points: Math.max(0, team.points + delta) }
+          : team
+      )
+    );
+  };
+
+  const moveTeamsToFinal = useCallback(
+    (aliveTeams: Team[]) => {
+      if (stage !== "stage1" || aliveTeams.length === 0) return;
+
+      const sortedByPoints = [...aliveTeams].sort((a, b) => {
+        if (b.points === a.points) {
+          return b.chances - a.chances;
+        }
+        return b.points - a.points;
+      });
+
+      if (sortedByPoints.length <= 1) {
+        setStage("finished");
+        setCurrentQuestion(null);
+        setActiveTeamId(null);
+        localStorage.removeItem("gameState");
+        return;
+      }
+
+      let finalists = sortedByPoints.filter((team) => team.points > 0).slice(0, 2);
+      if (finalists.length < 2) {
+        finalists = sortedByPoints.slice(0, 2);
+      }
+
+      if (finalists.length <= 1) {
+        setStage("finished");
+        setCurrentQuestion(null);
+        setActiveTeamId(null);
+        localStorage.removeItem("gameState");
+        return;
+      }
+
+      const finalistIds = new Set(finalists.map((team) => team.id));
+
+      setTeams((prevTeams) =>
+        prevTeams.map((team) => {
+          if (!finalistIds.has(team.id)) {
+            return { ...team, eliminated: true };
+          }
+          const lifeBonus = team.chances * GameService.POINTS_PER_CHANCE;
+          return {
+            ...team,
+            preFinalPoints: team.points,
+            points: lifeBonus,
+            eliminated: false,
+          };
+        })
       );
       setStage("stage3-part1");
       setQuestionCount(0);
       setActiveTeamId(null);
       setCurrentQuestion(null);
       setShowAnswer(false);
-      if (stage === "stage1") setStage1Phase("wheel");
+      setStage1SelfStreaks({});
+    },
+    [stage]
+  );
+
+  // --- przejście do finału ---
+  useEffect(() => {
+    if (stage !== "stage1") return;
+    const aliveTeams = teams.filter((team) => !team.eliminated);
+    if (aliveTeams.length === 0) return;
+
+    if (aliveTeams.length <= 2) {
+      moveTeamsToFinal(aliveTeams);
+      return;
     }
-  }, [teams, stage]);
+
+    if (stage1QuestionsResolved >= gameConfig.stage1QuestionLimit) {
+      moveTeamsToFinal(aliveTeams);
+    }
+  }, [teams, stage, stage1QuestionsResolved, gameConfig.stage1QuestionLimit, moveTeamsToFinal]);
 
   // --- ładowanie stanu gry ---
   useEffect(() => {
@@ -64,6 +142,9 @@ export default function Home() {
           setQuestionCount(parsedState.questionCount || 0);
           setStage1WrongAnswers(parsedState.stage1WrongAnswers || {});
           setUsedQuestionIds(parsedState.usedQuestionIds || []);
+          setStage1QuestionsResolved(parsedState.stage1QuestionsResolved || 0);
+          setGameConfig(parsedState.gameConfig || DEFAULT_GAME_CONFIG);
+          setStage1SelfStreaks(parsedState.stage1SelfStreaks || {});
         }
       } catch (e) {
         console.error("Błąd podczas ładowania stanu gry:", e);
@@ -80,21 +161,29 @@ export default function Home() {
         questionCount,
         stage1WrongAnswers,
         usedQuestionIds,
+        stage1QuestionsResolved,
+        stage1SelfStreaks,
+        gameConfig,
       };
       localStorage.setItem("gameState", JSON.stringify(gameState));
     }
   }, [teams, stage, questionCount, stage1WrongAnswers, usedQuestionIds]);
 
   // --- start gry ---
-  const handleGameStart = (initialTeams: Team[]) => {
+  const handleGameStart = (initialTeams: Team[], config: GameConfig) => {
     setTeams(initialTeams);
-    setInitialTeamCount(initialTeams.length); // <= zapisujemy ilość startowych
+    setGameConfig(config);
     setStage("stage1");
-  
+
     const wrongAnswers: Record<number, number> = {};
-    initialTeams.forEach(team => wrongAnswers[team.id] = 0);
+    initialTeams.forEach((team) => (wrongAnswers[team.id] = 0));
     setStage1WrongAnswers(wrongAnswers);
+    const initialStreaks: Record<number, number> = {};
+    initialTeams.forEach((team) => (initialStreaks[team.id] = 0));
+    setStage1SelfStreaks(initialStreaks);
     localStorage.removeItem("gameState");
+    resetTurnPoints();
+    setStage1QuestionsResolved(0);
   };
 
   // --- nowe pytanie ---
@@ -108,89 +197,116 @@ export default function Home() {
     }
   };
 
-  // --- poprawna odpowiedź ---
-  const handleCorrectAnswer = (targetTeamId?: number) => {
+    // --- poprawna odpowiedź ---
+  const handleCorrectAnswer = (targetTeamId?: number | null, multiplier = 1) => {
     if (!activeTeamId) return;
-  
+
+    const normalizedMultiplier = Math.max(1, multiplier);
+
     // === STAGE 1 ===
     if (stage === "stage1") {
-      // ❌ W tym etapie nie przyznajemy punktów
-      if (targetTeamId === activeTeamId) {
-        // drużyna odpowiada sama — kontynuuje grę
+      const selfAnswer = targetTeamId === activeTeamId;
+      if (selfAnswer) {
+        const currentStreak = stage1SelfStreaks[activeTeamId] || 0;
+        const newStreak = currentStreak + 1;
+        const prevPending = totalPointsThisTurn;
+        const newPending =
+          prevPending > 0 ? prevPending * 2 : GameService.POINTS_SELF_ANSWER;
+        const delta = newPending - prevPending;
+
+        setStage1SelfStreaks((prev) => ({
+          ...prev,
+          [activeTeamId]: newStreak,
+        }));
+
+        applyPointsToTeam(activeTeamId, delta);
+        setPointsThisTurn(delta);
+        setTotalPointsThisTurn(newPending);
+
         setStage1Phase("question");
         handleNewQuestion();
       } else if (targetTeamId) {
-        // wskazuje przeciwnika
-        setActiveTeamId(targetTeamId);
+        setStage1SelfStreaks((prev) => ({
+          ...prev,
+          [activeTeamId]: 0,
+        }));
+        applyPointsToTeam(activeTeamId, GameService.POINTS_CORRECT);
         setStage1Phase("question");
+        setActiveTeamId(targetTeamId);
         handleNewQuestion();
+        resetTurnPoints();
       } else {
-        // powrót do koła fortuny
+        setStage1SelfStreaks((prev) => ({
+          ...prev,
+          [activeTeamId]: 0,
+        }));
+        applyPointsToTeam(activeTeamId, GameService.POINTS_CORRECT);
         setStage1Phase("wheel");
         setActiveTeamId(null);
+        resetTurnPoints();
       }
-  
+
       setShowAnswer(false);
+      setStage1QuestionsResolved((prev) => prev + 1);
       return;
     }
-  
+
     // === STAGE 2 ===
     if (stage === "stage2") {
-      // ❌ W tym etapie również brak punktów
+      applyPointsToTeam(
+        activeTeamId,
+        GameService.POINTS_CORRECT * normalizedMultiplier
+      );
       setActiveTeamId(null);
       setShowAnswer(false);
       return;
     }
-  
-    // === STAGE 3 === (część 1 i 2)
+
+    // === STAGE 3 === (finał)
     if (stage === "stage3-part1" || stage === "stage3-part2") {
-      // ✅ Tutaj przyznajemy punkty za poprawną odpowiedź
-      setTeams(
-        teams.map((t) =>
-          t.id === activeTeamId
-            ? { ...t, points: t.points + GameService.POINTS_CORRECT }
-            : t
-        )
+      applyPointsToTeam(
+        activeTeamId,
+        GameService.POINTS_CORRECT * normalizedMultiplier
       );
-  
-      setQuestionCount((prev) => prev + 1);
-  
-      // jeśli skończyły się pytania — koniec gry
-      if (questionCount + 1 >= GameService.STAGE3_MAX_QUESTIONS) {
-        setStage("finished");
-        localStorage.removeItem("gameState");
-      }
-  
+
+      setQuestionCount((prev) => {
+        const next = prev + 1;
+        if (next >= finalQuestionLimit) {
+          setStage("finished");
+          localStorage.removeItem("gameState");
+        }
+        return next;
+      });
+
       setActiveTeamId(null);
       setShowAnswer(false);
     }
   };
-  
   // --- błędna odpowiedź ---
-  const handleWrongAnswer = () => {
+  const handleWrongAnswer = (pointsLost?: number) => {
     if (!activeTeamId) return;
 
-    setTeams(
-      teams.map((t) => {
-        if (t.id === activeTeamId) {
-          const currentWrongAnswers = stage1WrongAnswers[t.id] || 0;
-          const nextWrongAnswers =
-            stage === "stage1" ? currentWrongAnswers + 1 : currentWrongAnswers;
-          const newChances = Math.max(0, t.chances - 1);
-          const eliminated =
-            stage === "stage1"
-              ? nextWrongAnswers >= GameService.STAGE1_CHANCES
-              : newChances <= 0;
-          const newPoints = Math.max(0, t.points - GameService.POINTS_CORRECT); // -10 pkt
+    const penalty = Math.max(0, pointsLost ?? GameService.POINTS_CORRECT);
 
-          return {
-            ...t,
-            points: newPoints,
-            chances: newChances,
-            eliminated,
-          };
-        }
-        return t;
+    setTeams((prevTeams) =>
+      prevTeams.map((team) => {
+        if (team.id !== activeTeamId) return team;
+        const currentWrongAnswers = stage1WrongAnswers[team.id] || 0;
+        const nextWrongAnswers =
+          stage === "stage1" ? currentWrongAnswers + 1 : currentWrongAnswers;
+        const newChances = Math.max(0, team.chances - 1);
+        const eliminated =
+          stage === "stage1"
+            ? nextWrongAnswers >= GameService.STAGE1_CHANCES
+            : newChances <= 0;
+        const newPoints = Math.max(0, team.points - penalty);
+
+        return {
+          ...team,
+          points: newPoints,
+          chances: newChances,
+          eliminated,
+        };
       })
     );
 
@@ -200,23 +316,30 @@ export default function Home() {
         [activeTeamId]: (prev[activeTeamId] || 0) + 1,
       }));
 
-      // po błędzie wracamy do koła
       setStage1Phase("wheel");
       setActiveTeamId(null);
-      setPointsThisTurn(0);
-      setTotalPointsThisTurn(0);
+      resetTurnPoints();
+      setStage1SelfStreaks((prev) => ({
+        ...prev,
+        [activeTeamId]: 0,
+      }));
+      setStage1QuestionsResolved((prev) => prev + 1);
     }
 
     if (stage === "stage3-part1" || stage === "stage3-part2") {
-      setQuestionCount((prev) => prev + 1);
+      setQuestionCount((prev) => {
+        const next = prev + 1;
+        if (next >= finalQuestionLimit) {
+          setStage("finished");
+          localStorage.removeItem("gameState");
+        }
+        return next;
+      });
 
       const activeTeams = teams.filter(
-        (t) => !t.eliminated && t.id !== activeTeamId
+        (team) => !team.eliminated && team.id !== activeTeamId
       );
-      if (
-        activeTeams.length === 0 ||
-        questionCount + 1 >= GameService.STAGE3_MAX_QUESTIONS
-      ) {
+      if (activeTeams.length === 0) {
         setStage("finished");
         localStorage.removeItem("gameState");
       }
@@ -224,8 +347,7 @@ export default function Home() {
 
     setShowAnswer(false);
   };
-
-  // --- inne akcje ---
+// --- inne akcje ---
   const handleManualSelectTeam = (teamId: number) => {
     const team = teams.find((t) => t.id === teamId);
     if (!team || team.eliminated) return;
@@ -233,6 +355,11 @@ export default function Home() {
     setActiveTeamId(teamId);
     if (stage === "stage1") {
       setStage1Phase("question");
+      setStage1SelfStreaks((prev) => ({
+        ...prev,
+        [teamId]: 0,
+      }));
+      resetTurnPoints();
     }
   };
 
@@ -246,22 +373,11 @@ export default function Home() {
 
   const handleNextStage = () => {
     if (stage === "stage1") {
-      setTeams(
-        teams.map((t) =>
-          !t.eliminated
-            ? { ...t, chances: GameService.STAGE2_INITIAL_CHANCES }
-            : t
-        )
-      );
-      setStage("stage2");
+      const aliveTeams = teams.filter((team) => !team.eliminated);
+      if (aliveTeams.length) {
+        moveTeamsToFinal(aliveTeams);
+      }
     } else if (stage === "stage2") {
-      setTeams(
-        teams.map((t) =>
-          !t.eliminated
-            ? { ...t, chances: GameService.STAGE3_INITIAL_CHANCES }
-            : t
-        )
-      );
       setStage("stage3-part1");
       setQuestionCount(0);
     } else if (stage === "stage3-part1") {
@@ -278,6 +394,9 @@ export default function Home() {
     setCurrentQuestion(null);
     setUsedQuestionIds([]);
     setShowAnswer(false);
+    setStage1QuestionsResolved(0);
+    setStage1SelfStreaks({});
+    resetTurnPoints();
     localStorage.removeItem("gameState");
   };
 
@@ -334,6 +453,7 @@ export default function Home() {
         <StageHeader
           stage={stage}
           questionCount={stage.includes("stage3") ? questionCount : undefined}
+          questionLimit={finalQuestionLimit}
         />
 
         {stage === "finished" && winner ? (
@@ -366,6 +486,11 @@ export default function Home() {
                           setActiveTeamId(team.id);
                           if (stage === "stage1") {
                             setStage1Phase("question");
+                            setStage1SelfStreaks((prev) => ({
+                              ...prev,
+                              [team.id]: 0,
+                            }));
+                            resetTurnPoints();
                             handleNewQuestion();
                           } else {
                             handleNewQuestion();
@@ -385,6 +510,11 @@ export default function Home() {
                   onTeamSelected={(teamId) => {
                     setActiveTeamId(teamId);
                     setStage1Phase("question");
+                    setStage1SelfStreaks((prev) => ({
+                      ...prev,
+                      [teamId]: 0,
+                    }));
+                    resetTurnPoints();
                     handleNewQuestion();
                   }}
                   onFinishGame={handleFinishGame}
@@ -399,8 +529,19 @@ export default function Home() {
                   onToggleAnswer={() => setShowAnswer(!showAnswer)}
                   onCorrectAnswer={handleCorrectAnswer}
                   onWrongAnswer={handleWrongAnswer}
-                  onCancel={() => setStage1Phase("wheel")}
+                  onCancel={() => {
+                    setStage1Phase("wheel");
+                    setActiveTeamId(null);
+                    resetTurnPoints();
+                    if (activeTeamId) {
+                      setStage1SelfStreaks((prev) => ({
+                        ...prev,
+                        [activeTeamId]: 0,
+                      }));
+                    }
+                  }}
                   onFinishGame={handleFinishGame}
+                  selfStreak={activeTeamId ? stage1SelfStreaks[activeTeamId] || 0 : 0}
                 />
               ) : (
                 <ControlPanel

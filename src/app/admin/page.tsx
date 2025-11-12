@@ -28,7 +28,17 @@ export default function AdminPage() {
   // Zapisywanie stanu gry do localStorage przy każdej zmianie
   useEffect(() => {
     if (stage !== 'finished') {
+      let persistedState: Record<string, unknown> = {};
+      const existing = localStorage.getItem('gameState');
+      if (existing) {
+        try {
+          persistedState = JSON.parse(existing);
+        } catch {
+          persistedState = {};
+        }
+      }
       const gameState = {
+        ...persistedState,
         teams,
         stage,
       };

@@ -2,14 +2,14 @@
 
 import React from 'react';
 import { GameStage } from '../../lib/types';
-import { GameService } from '../../lib/gameService';
 
 interface StageHeaderProps {
   stage: GameStage;
   questionCount?: number;
+  questionLimit?: number;
 }
 
-const StageHeader: React.FC<StageHeaderProps> = ({ stage, questionCount }) => {
+const StageHeader: React.FC<StageHeaderProps> = ({ stage, questionCount, questionLimit }) => {
   const stageNames: Record<GameStage, string> = {
     'setup': 'KONFIGURACJA',
     'stage1': 'ETAP I - ROZPOCZĘCIE',
@@ -26,7 +26,7 @@ const StageHeader: React.FC<StageHeaderProps> = ({ stage, questionCount }) => {
       </h2>
       {questionCount !== undefined && stage.includes('stage3') && (
         <p className="text-center text-2xl font-bold">
-          Pytanie {questionCount + 1} / {GameService.STAGE3_MAX_QUESTIONS}
+          Pytanie {questionCount + 1} / {questionLimit ?? questionCount + 1}
         </p>
       )}
     </div>

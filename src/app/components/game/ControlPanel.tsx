@@ -117,7 +117,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
             </div>
           )}
 
-          {(stage === 'stage3-part1' || stage === 'stage3-part2') && activeTeamId && (
+          {/* {(stage === 'stage3-part1' || stage === 'stage3-part2') && activeTeamId && (
             <div className="mb-6 p-5 bg-black/40 border-2 border-gray-700 rounded-xl backdrop-blur">
               <p className="text-white font-bold mb-3 text-sm uppercase">Dodaj punkty:</p>
               <div className="grid grid-cols-2 gap-3">
@@ -135,7 +135,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
                 </button>
               </div>
             </div>
-          )}
+          )} */}
         </>
       )}
 
@@ -183,7 +183,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
           onClick={onNextStage}
           className="w-full bg-gradient-to-r from-white to-gray-200 hover:from-gray-200 hover:to-gray-300 border-4 border-gray-300 text-black font-bold py-4 px-6 rounded-xl transition-all shadow-[0_0_40px_rgba(255,255,255,0.5)] text-lg uppercase"
         >
-          ➡️ Przejdź do Etapu II
+          Przejdz do finalu
         </button>
       )}
 
@@ -192,7 +192,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
           onClick={onNextStage}
           className="w-full bg-gradient-to-r from-white to-gray-200 hover:from-gray-200 hover:to-gray-300 border-4 border-gray-300 text-black font-bold py-4 px-6 rounded-xl transition-all shadow-[0_0_40px_rgba(255,255,255,0.5)] text-lg uppercase"
         >
-          🏆 Przejdź do Finału
+          Rozpocznij final
         </button>
       )}
     </div>

@@ -9,12 +9,13 @@ interface AnswerPanelProps {
   teams: Team[];
   questionId?: number;
   totalPointsThisTurn: number;
-  showAnswer?: boolean;  // DODAJ TO
-  onToggleAnswer?: () => void;  // DODAJ TO
+  showAnswer?: boolean;
+  onToggleAnswer?: () => void;
   onCorrectAnswer: (targetTeamId: number, multiplier: number) => void;
   onWrongAnswer: (pointsLost: number) => void;
   onCancel: () => void;
   onFinishGame?: () => void;
+  selfStreak?: number;
 }
 
 const AnswerPanel: React.FC<AnswerPanelProps> = ({ 
@@ -27,20 +28,19 @@ const AnswerPanel: React.FC<AnswerPanelProps> = ({
   onCorrectAnswer, 
   onWrongAnswer,
   onCancel,
-  onFinishGame
+  onFinishGame,
+  selfStreak = 0
 }) => {
   const [answerStatus, setAnswerStatus] = useState<'pending' | 'correct' | 'wrong'>('pending');
   const [targetType, setTargetType] = useState<'self' | 'other' | null>(null);
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
   const [multiplier, setMultiplier] = useState(1);
-  const [selfAnswerCount, setSelfAnswerCount] = useState(0); // Track "on myself" answers in current turn
 
   const resetPanel = useCallback(() => {
     setAnswerStatus('pending');
     setTargetType(null);
     setSelectedTeamId(null);
     setMultiplier(1);
-    setSelfAnswerCount(0);
   }, []);
 
   useEffect(() => {
@@ -53,7 +53,6 @@ const AnswerPanel: React.FC<AnswerPanelProps> = ({
       setTargetType(null);
       setSelectedTeamId(null);
       setMultiplier(1);
-      setSelfAnswerCount(0); // Reset self answer count on wrong answer
     }
   };
 
@@ -61,17 +60,11 @@ const AnswerPanel: React.FC<AnswerPanelProps> = ({
     setTargetType(type);
     if (type === 'self') {
       setSelectedTeamId(activeTeam.id);
-      // Calculate multiplier based on consecutive "on myself" answers
-      // Multiplier: 2^count (1 -> 2, 2 -> 4, 3 -> 8, itd.)
-      const newCount = selfAnswerCount + 1;
-      setSelfAnswerCount(newCount);
-      const calculatedMultiplier = Math.pow(2, newCount);
+      const calculatedMultiplier = Math.pow(2, Math.max(0, selfStreak));
       setMultiplier(calculatedMultiplier);
     } else {
       setSelectedTeamId(null);
       setMultiplier(1);
-      // Reset "on myself" count when choosing another team
-      setSelfAnswerCount(0);
     }
   };
 
@@ -80,10 +73,6 @@ const AnswerPanel: React.FC<AnswerPanelProps> = ({
       const targetTeamId = targetType === 'self' ? activeTeam.id : selectedTeamId;
       if (targetTeamId) {
         onCorrectAnswer(targetTeamId, multiplier);
-        // Only reset self answer count if we're not choosing "on myself" again
-        if (targetType !== 'self') {
-          setSelfAnswerCount(0);
-        }
         resetPanel();
       }
     } else if (answerStatus === 'wrong') {
@@ -203,7 +192,7 @@ const AnswerPanel: React.FC<AnswerPanelProps> = ({
               <h5 className="text-lg font-bold text-white mb-3 text-center">Mnożnik punktów: x{multiplier}</h5>
               {targetType === 'self' && (
                 <div className="text-center text-gray-300 text-sm">
-                  Odpowiedzi "na siebie" w tej turze: {selfAnswerCount}
+                  Udane odpowiedzi "na siebie" w tej turze: {selfStreak}
                 </div>
               )}
             </div>

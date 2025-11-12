@@ -114,6 +114,11 @@ const WinnerDisplay: React.FC<WinnerDisplayProps> = ({ winner, teams, onNewGame 
                 <h3 className="text-6xl font-black text-white drop-shadow-lg">
                   {winner.name}
                 </h3>
+                {typeof winner.preFinalPoints === 'number' && (
+                  <p className="text-xl font-semibold text-white/80 mt-2">
+                    Punkty po rundzie 1: {winner.preFinalPoints}
+                  </p>
+                )}
               </div>
 
               <div className="flex items-center justify-center gap-4 text-4xl font-bold text-white">
@@ -172,6 +177,11 @@ const WinnerDisplay: React.FC<WinnerDisplayProps> = ({ winner, teams, onNewGame 
                       } drop-shadow-lg`}>
                         {team.name}
                       </span>
+                      {typeof team.preFinalPoints === 'number' && (
+                        <p className="text-sm text-gray-100/80">
+                          Runda 1: {team.preFinalPoints} pkt
+                        </p>
+                      )}
                       {index === 0 && (
                         <div className="flex gap-1 mt-1">
                           {[...Array(5)].map((_, i) => (
