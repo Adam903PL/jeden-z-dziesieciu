@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Trophy, RotateCcw, Crown, Star, Sparkles } from 'lucide-react';
 import { Team, GameService } from '../../lib';
 
@@ -13,15 +13,6 @@ interface WinnerDisplayProps {
 const WinnerDisplay: React.FC<WinnerDisplayProps> = ({ winner, teams, onNewGame }) => {
   const [showConfetti, setShowConfetti] = useState(true);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setShowConfetti(false), 5000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const sortedTeams = [...teams].sort(
-    (a, b) => GameService.calculateFinalScore(b) - GameService.calculateFinalScore(a)
-  );
-
   const getRoundOnePoints = (team: Team) =>
     typeof team.preFinalPoints === 'number' ? team.preFinalPoints : team.points;
 
@@ -30,6 +21,62 @@ const WinnerDisplay: React.FC<WinnerDisplayProps> = ({ winner, teams, onNewGame 
 
   const getCombinedPoints = (team: Team) =>
     getRoundOnePoints(team) + getFinalStagePoints(team);
+
+  const finalists = teams.filter((team) => typeof team.preFinalPoints === 'number');
+  const aliveFinalists = finalists.filter((team) => !team.eliminated);
+
+  const finalistWinner = useMemo(() => {
+    if (aliveFinalists.length === 1) return aliveFinalists[0];
+    if (aliveFinalists.length > 1) {
+      return aliveFinalists.reduce((prev, current) =>
+        current.points > prev.points ? current : prev
+      );
+    }
+    if (finalists.length > 0) {
+      return finalists.reduce((prev, current) =>
+        current.points > prev.points ? current : prev
+      );
+    }
+    return undefined;
+  }, [aliveFinalists, finalists]);
+
+  const finalistsOrdered = useMemo(() => {
+    if (finalists.length === 0) return [];
+    const order: Team[] = [];
+    if (finalistWinner) {
+      order.push(finalistWinner);
+    }
+    const remainingFinalists = finalists
+      .filter((team) => (finalistWinner ? team.id !== finalistWinner.id : true))
+      .sort((a, b) => b.points - a.points);
+    if (remainingFinalists.length > 0) {
+      order.push(remainingFinalists[0]);
+      order.push(...remainingFinalists.slice(1));
+    }
+    return order;
+  }, [finalistWinner, finalists]);
+
+  const remainingTeams = useMemo(
+    () =>
+      teams
+        .filter((team) => !finalistsOrdered.some((finalist) => finalist.id === team.id))
+        .sort(
+          (a, b) => GameService.calculateFinalScore(b) - GameService.calculateFinalScore(a)
+        ),
+    [teams, finalistsOrdered]
+  );
+
+  const sortedTeams =
+    finalistsOrdered.length > 0
+      ? [...finalistsOrdered, ...remainingTeams]
+      : [...teams].sort(
+          (a, b) => GameService.calculateFinalScore(b) - GameService.calculateFinalScore(a)
+        );
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowConfetti(false), 5000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const getMedalEmoji = (index: number) => {
     if (index === 0) return '🥇';
@@ -106,15 +153,9 @@ const WinnerDisplay: React.FC<WinnerDisplayProps> = ({ winner, teams, onNewGame 
 
               <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 mb-6 border-4 border-white/50 space-y-2">
                 <h3 className="text-6xl font-black text-white drop-shadow-lg">{winner.name}</h3>
-                <p className="text-lg font-semibold text-white/80">
-                  Runda 1: {getRoundOnePoints(winner)} pkt
-                </p>
-                <p className="text-lg font-semibold text-white/80">
-                  Finał: {getFinalStagePoints(winner)} pkt
-                </p>
-                <p className="text-2xl font-black text-white">
-                  Łącznie: {getCombinedPoints(winner)} pkt
-                </p>
+                <p className="text-lg font-semibold text-white/80">Runda 1: {getRoundOnePoints(winner)} pkt</p>
+                <p className="text-lg font-semibold text-white/80">Finał: {getFinalStagePoints(winner)} pkt</p>
+                <p className="text-2xl font-black text-white">Łącznie: {getCombinedPoints(winner)} pkt</p>
               </div>
 
               <div className="flex items-center justify-center gap-4 text-4xl font-bold text-white">
@@ -184,21 +225,14 @@ const WinnerDisplay: React.FC<WinnerDisplayProps> = ({ winner, teams, onNewGame 
                       <div className="text-sm text-gray-100/80 space-y-1 mt-1">
                         <p>Runda 1: {getRoundOnePoints(team)} pkt</p>
                         <p>Finał: {getFinalStagePoints(team)} pkt</p>
-                        <p className="font-semibold text-white">
-                          Łącznie: {getCombinedPoints(team)} pkt
-                        </p>
+                        <p className="font-semibold text-white">Łącznie: {getCombinedPoints(team)} pkt</p>
                       </div>
                       {index === 0 && (
-                        <>
-                          <div className="flex gap-1 mt-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} className="w-5 h-5 text-yellow-300 fill-yellow-300" />
-                            ))}
-                          </div>
-                          <p className="text-xs text-white/70 mt-1">
-                            Bonus za przeżycie: {team.chances * GameService.POINTS_PER_CHANCE} pkt
-                          </p>
-                        </>
+                        <div className="flex gap-1 mt-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} className="w-5 h-5 text-yellow-300 fill-yellow-300" />
+                          ))}
+                        </div>
                       )}
                     </div>
                   </div>

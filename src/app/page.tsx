@@ -480,16 +480,34 @@ export default function Home() {
     localStorage.removeItem("gameState");
   };
 
-  const activeTeams = teams.filter((t) => !t.eliminated);
-  const winner =
-    stage === "finished" && activeTeams.length > 0
-      ? activeTeams.reduce((prev, current) =>
-          GameService.calculateFinalScore(current) >
-          GameService.calculateFinalScore(prev)
-            ? current
-            : prev
-        )
-      : null;
+  const finalists = teams.filter((team) => typeof team.preFinalPoints === "number");
+  const aliveFinalists = finalists.filter((team) => !team.eliminated);
+  const deadFinalists = finalists.filter((team) => team.eliminated);
+  const activeNonFinalists = teams.filter((team) => !team.eliminated && typeof team.preFinalPoints !== "number");
+
+  const determineWinner = () => {
+    if (aliveFinalists.length === 1) return aliveFinalists[0];
+    if (aliveFinalists.length > 1) {
+      return aliveFinalists.reduce((prev, current) =>
+        current.points > prev.points ? current : prev
+      );
+    }
+    if (finalists.length > 0) {
+      return finalists.reduce((prev, current) =>
+        current.points > prev.points ? current : prev
+      );
+    }
+    if (activeNonFinalists.length > 0) {
+      return activeNonFinalists.reduce((prev, current) =>
+        GameService.calculateFinalScore(current) > GameService.calculateFinalScore(prev)
+          ? current
+          : prev
+      );
+    }
+    return null;
+  };
+
+  const winner = stage === "finished" ? determineWinner() : null;
 
   if (stage === "setup") {
     return <GameSetup onStart={handleGameStart} />;
